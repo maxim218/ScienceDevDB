@@ -23,12 +23,11 @@ CREATE TABLE records
 CREATE OR REPLACE FUNCTION add_record(login_param TEXT, password_param TEXT, content_param TEXT) RETURNS TEXT AS $$
     DECLARE man RECORD;
     DECLARE n BIGINT;
-    DECLARE record_info RECORD;
     DECLARE found BOOLEAN;
 BEGIN
     found = False;
     n = 0;
-    FOR man IN SELECT * FROM people WHERE man_nickname = login_param AND man_password = password_param LIMIT 1 LOOP
+    FOR man IN SELECT man_id FROM people WHERE man_nickname = login_param AND man_password = password_param LIMIT 1 LOOP
         found = True;
         n = man.man_id;
     END LOOP;
@@ -66,7 +65,7 @@ CREATE OR REPLACE FUNCTION normal_login_password(login_param TEXT, password_para
     DECLARE found BOOLEAN;
 BEGIN
     found = False;
-    FOR man IN SELECT * FROM people WHERE man_nickname = login_param AND man_password = password_param LIMIT 1 LOOP
+    FOR man IN SELECT man_nickname, man_password FROM people WHERE man_nickname = login_param AND man_password = password_param LIMIT 1 LOOP
         man_result = man;
         found = True;
     END LOOP;
