@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 7);
+/******/ 	return __webpack_require__(__webpack_require__.s = 8);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -124,6 +124,10 @@ class QuerySender {
         client.connect();
 
         client.query(query, (err, res) => {
+            if(err !== null && err !== undefined) {
+                console.log(err);
+            }
+
             resultObj.arr = res.rows;
             client.end();
             callback();
@@ -224,6 +228,20 @@ class StringGenerator {
 
         return queryString;
     }
+
+    generateQueryNoAnswer() {
+        const functionName = this.functionName;
+        const paramsArray = this.paramsArray;
+
+        for(let i = 0; i < paramsArray.length; i++) {
+            paramsArray[i] = "'" + paramsArray[i] + "'";
+        }
+
+        const queryString = " SELECT * FROM " + functionName + "(" + paramsArray.join(",") + "); ";
+        console.log("Query: " + queryString);
+
+        return queryString;
+    }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = StringGenerator;
 
@@ -231,31 +249,6 @@ class StringGenerator {
 
 /***/ }),
 /* 5 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-
-
-class ModuleImporter {
-    constructor(s) {
-        this.initModuleName(s);
-    }
-
-    initModuleName(s) {
-        this.moduleName = s.toString();
-    }
-
-    getModule() {
-        const command = " require('" + this.moduleName + "'); ";
-        return eval(command);
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = ModuleImporter;
-
-
-
-/***/ }),
-/* 6 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -292,13 +285,85 @@ class PasswordHashModifier {
 
 
 /***/ }),
+/* 6 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+
+
+class ModuleImporter {
+    constructor(s) {
+        this.initModuleName(s);
+    }
+
+    initModuleName(s) {
+        this.moduleName = s.toString();
+    }
+
+    getModule() {
+        const command = " require('" + this.moduleName + "'); ";
+        return eval(command);
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = ModuleImporter;
+
+
+
+/***/ }),
 /* 7 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+
+
+class StringCodeManager {
+    constructor(stringParam) {
+        this.s = (stringParam + "").toString();
+    }
+
+    static getNumberOfChar(c) {
+        return c.charCodeAt(0);
+    }
+
+    codeString() {
+        const s = this.s;
+        const mass = [];
+
+        for(let i = 0; i < s.length; i++) {
+            const c = s.charAt(i);
+            const n = StringCodeManager.getNumberOfChar(c);
+            mass.push(n);
+        }
+
+        return mass.join("_");
+    }
+
+    decodeString() {
+        const s = (this.s + "").toString();
+        const mass = s.split("_");
+
+        let answer = "";
+
+        for(let i = 0; i < mass.length; i++) {
+            const n = mass[i];
+            answer += String.fromCharCode(n);
+        }
+
+        return answer;
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = StringCodeManager;
+
+
+
+/***/ }),
+/* 8 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* WEBPACK VAR INJECTION */(function(process) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_ModuleImporter__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__QueryGetter__ = __webpack_require__(9);
+/* WEBPACK VAR INJECTION */(function(process) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_ModuleImporter__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__QueryGetter__ = __webpack_require__(10);
 
 
 
@@ -333,10 +398,10 @@ class ServerStarter {
 const serverStarter = new ServerStarter(5000);
 
 
-/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(8)))
+/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(9)))
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -526,11 +591,11 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__UrlManager__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__UrlManager__ = __webpack_require__(11);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ResponseWriter__ = __webpack_require__(0);
 
 
@@ -544,12 +609,16 @@ class QueryGetter {
         this.usePostQueries();
         this.urlManager = new __WEBPACK_IMPORTED_MODULE_0__UrlManager__["a" /* default */](this.app);
 
-        this.allowedOperations = [
+        this.allowedOperationsGet = [
             "about_server",
             "init_database",
+        ];
+
+        this.allowedOperationsPost = [
             "registrate_user",
             "authorize_user",
             "add_record",
+            "get_records",
         ];
     }
 
@@ -573,7 +642,7 @@ class QueryGetter {
             const url = request.url;
             const operation = QueryGetter.getOperation(url);
             QueryGetter.printInfo("GET", request, response, operation, null);
-            if(this.allowedOperations.indexOf(operation) === -1) {
+            if(this.allowedOperationsGet.indexOf(operation) === -1) {
                 new __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ResponseWriter__["a" /* default */]("__NOT_ALLOWED_OPERATION__", response);
             } else {
                 this.urlManager.routeQuery(request, response, operation, url, null);
@@ -585,7 +654,7 @@ class QueryGetter {
         this.app.post('/*', (request, response) => {
             const url = request.url;
             const operation = QueryGetter.getOperation(url);
-            if(this.allowedOperations.indexOf(operation) === -1) {
+            if(this.allowedOperationsPost.indexOf(operation) === -1) {
                 new __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ResponseWriter__["a" /* default */]("__NOT_ALLOWED_OPERATION__", response);
             } else {
                 let dataString = "";
@@ -611,16 +680,18 @@ class QueryGetter {
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ControllersScripts_AboutServerController__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ModuleImporter__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__ControllersScripts_DataBaseIniter__ = __webpack_require__(12);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__ControllersScripts_UserRegistrator__ = __webpack_require__(13);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__ControllersScripts_UserAuthorizer__ = __webpack_require__(14);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__ControllersScripts_RecordAdder__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ControllersScripts_AboutServerController__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ModuleImporter__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__ControllersScripts_DataBaseIniter__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__ControllersScripts_UserRegistrator__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__ControllersScripts_UserAuthorizer__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__ControllersScripts_RecordAdder__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__ControllersScripts_RecordsGetter__ = __webpack_require__(17);
+
 
 
 
@@ -661,6 +732,12 @@ class UrlManager {
 
         if(operation === "add_record") {
             new __WEBPACK_IMPORTED_MODULE_5__ControllersScripts_RecordAdder__["a" /* default */](this.pg, body, this.SHA256, response);
+            return;
+        }
+
+        if(operation === "get_records") {
+            new __WEBPACK_IMPORTED_MODULE_6__ControllersScripts_RecordsGetter__["a" /* default */](this.pg, body, response);
+            return;
         }
     }
 }
@@ -669,7 +746,7 @@ class UrlManager {
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -689,7 +766,7 @@ class AboutServerController {
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -726,7 +803,7 @@ class DataBaseIniter {
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -735,7 +812,7 @@ class DataBaseIniter {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_StringGenerator__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_QuerySender__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__HelpingScripts_ResponseWriter__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__HelpingScripts_PasswordHashModifier__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__HelpingScripts_PasswordHashModifier__ = __webpack_require__(5);
 
 
 
@@ -795,7 +872,7 @@ class UserRegistrator {
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -804,7 +881,7 @@ class UserRegistrator {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_StringGenerator__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__HelpingScripts_QuerySender__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__HelpingScripts_PasswordHashModifier__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__HelpingScripts_PasswordHashModifier__ = __webpack_require__(5);
 
 
 
@@ -865,7 +942,7 @@ class UserAuthorizer {
 
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -874,7 +951,7 @@ class UserAuthorizer {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_StringGenerator__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__HelpingScripts_QuerySender__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__HelpingScripts_StringCodeManager__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__HelpingScripts_StringCodeManager__ = __webpack_require__(7);
 
 
 
@@ -946,49 +1023,86 @@ class RecordAdder {
 
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_ResponseWriter__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_FieldsFinder__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_StringGenerator__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__HelpingScripts_QuerySender__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__HelpingScripts_PasswordHashModifier__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__HelpingScripts_StringCodeManager__ = __webpack_require__(7);
 
 
-class StringCodeManager {
-    constructor(stringParam) {
-        this.s = (stringParam + "").toString();
+
+
+
+
+
+
+
+
+class RecordsGetter {
+    constructor(pg, body, response) {
+        this.pg = pg;
+        this.body = body;
+        this.response = response;
+        this.getRecords();
     }
 
-    static getNumberOfChar(c) {
-        return c.charCodeAt(0);
-    }
+    getRecords() {
+        const body = this.body;
 
-    codeString() {
-        const s = this.s;
-        const mass = [];
-
-        for(let i = 0; i < s.length; i++) {
-            const c = s.charAt(i);
-            const n = StringCodeManager.getNumberOfChar(c);
-            mass.push(n);
+        if(new __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_FieldsFinder__["a" /* default */](body, ["loginField"]).controleFields() === false) {
+            new __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_ResponseWriter__["a" /* default */]("__FIELD_NOT_FOUND__", this.response);
+            return;
         }
 
-        return mass.join("_");
-    }
+        const login = (body.loginField + "").toString();
 
-    decodeString() {
-        const s = (this.s + "").toString();
-        const mass = s.split("_");
-
-        let answer = "";
-
-        for(let i = 0; i < mass.length; i++) {
-            const n = mass[i];
-            answer += String.fromCharCode(n);
+        if(login === "") {
+            new __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_ResponseWriter__["a" /* default */]("__LOGIN_FIELD_EMPTY__", this.response);
+            return;
         }
 
-        return answer;
+        if(login.length > 10) {
+            new __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_ResponseWriter__["a" /* default */]("__LONG_FIELD_VERY_LONG__", this.response);
+            return;
+        }
+
+        if(new __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__["a" /* default */](login).normalString() === false) {
+            new __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_ResponseWriter__["a" /* default */]("__BAD_CHARS_FIELD_LOGIN__", this.response);
+            return;
+        }
+
+        let res = {
+            arr: []
+        };
+
+        const query = new __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_StringGenerator__["a" /* default */]("get_records_of_user", [login]).generateQueryNoAnswer();
+        new __WEBPACK_IMPORTED_MODULE_4__HelpingScripts_QuerySender__["a" /* default */](this.pg).makeQuery(query, res, () => {
+            const mass = res.arr;
+            const answer = [];
+
+            for(let i = 0; i < mass.length; i++) {
+                const element = mass[i];
+                const contentString = new __WEBPACK_IMPORTED_MODULE_6__HelpingScripts_StringCodeManager__["a" /* default */](element.record_content_t + "").decodeString();
+
+                answer.push({
+                    r_id: element.record_id_t,
+                    m_id: element.man_id_t,
+                    m_nn: element.man_nickname_t,
+                    r_cc: contentString
+                })
+            }
+
+            new __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_ResponseWriter__["a" /* default */](JSON.stringify(answer), this.response);
+        });
     }
 }
-/* harmony export (immutable) */ __webpack_exports__["a"] = StringCodeManager;
+/* harmony export (immutable) */ __webpack_exports__["a"] = RecordsGetter;
 
 
 

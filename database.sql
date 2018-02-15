@@ -20,6 +20,23 @@ CREATE TABLE records
 
 /* -------------------------------------------------------- */
 
+CREATE OR REPLACE FUNCTION get_records_of_user(login_param TEXT)
+   RETURNS TABLE
+   (
+       record_id_t BIGINT,
+       record_content_t TEXT,
+       man_id_t BIGINT,
+       man_nickname_t TEXT
+   )
+   AS $mytable$
+BEGIN
+   RETURN QUERY
+   SELECT record_id AS record_id_t, record_content AS record_content_t, man_id AS man_id_t, man_nickname AS man_nickname_t FROM records INNER JOIN people ON (man_key = man_id) WHERE man_nickname = login_param ORDER BY record_id DESC;
+END
+$mytable$ LANGUAGE plpgsql;
+
+/* -------------------------------------------------------- */
+
 CREATE OR REPLACE FUNCTION add_record(login_param TEXT, password_param TEXT, content_param TEXT) RETURNS TEXT AS $$
     DECLARE man RECORD;
     DECLARE n BIGINT;

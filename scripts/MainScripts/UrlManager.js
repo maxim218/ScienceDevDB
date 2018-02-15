@@ -6,6 +6,7 @@ import DataBaseIniter from "../ControllersScripts/DataBaseIniter";
 import UserRegistrator from "../ControllersScripts/UserRegistrator";
 import UserAuthorizer from "../ControllersScripts/UserAuthorizer";
 import RecordAdder from "../ControllersScripts/RecordAdder";
+import RecordsGetter from "../ControllersScripts/RecordsGetter";
 
 export default class UrlManager {
     constructor(app) {
@@ -38,6 +39,12 @@ export default class UrlManager {
 
         if(operation === "add_record") {
             new RecordAdder(this.pg, body, this.SHA256, response);
+            return;
+        }
+
+        if(operation === "get_records") {
+            new RecordsGetter(this.pg, body, response);
+            return;
         }
     }
 }

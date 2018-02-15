@@ -19,4 +19,18 @@ export default class StringGenerator {
 
         return queryString;
     }
+
+    generateQueryNoAnswer() {
+        const functionName = this.functionName;
+        const paramsArray = this.paramsArray;
+
+        for(let i = 0; i < paramsArray.length; i++) {
+            paramsArray[i] = "'" + paramsArray[i] + "'";
+        }
+
+        const queryString = " SELECT * FROM " + functionName + "(" + paramsArray.join(",") + "); ";
+        console.log("Query: " + queryString);
+
+        return queryString;
+    }
 }

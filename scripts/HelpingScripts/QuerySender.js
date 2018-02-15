@@ -21,6 +21,10 @@ export default class QuerySender {
         client.connect();
 
         client.query(query, (err, res) => {
+            if(err !== null && err !== undefined) {
+                console.log(err);
+            }
+
             resultObj.arr = res.rows;
             client.end();
             callback();

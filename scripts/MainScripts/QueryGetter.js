@@ -10,12 +10,16 @@ export default class QueryGetter {
         this.usePostQueries();
         this.urlManager = new UrlManager(this.app);
 
-        this.allowedOperations = [
+        this.allowedOperationsGet = [
             "about_server",
             "init_database",
+        ];
+
+        this.allowedOperationsPost = [
             "registrate_user",
             "authorize_user",
             "add_record",
+            "get_records",
         ];
     }
 
@@ -39,7 +43,7 @@ export default class QueryGetter {
             const url = request.url;
             const operation = QueryGetter.getOperation(url);
             QueryGetter.printInfo("GET", request, response, operation, null);
-            if(this.allowedOperations.indexOf(operation) === -1) {
+            if(this.allowedOperationsGet.indexOf(operation) === -1) {
                 new ResponseWriter("__NOT_ALLOWED_OPERATION__", response);
             } else {
                 this.urlManager.routeQuery(request, response, operation, url, null);
@@ -51,7 +55,7 @@ export default class QueryGetter {
         this.app.post('/*', (request, response) => {
             const url = request.url;
             const operation = QueryGetter.getOperation(url);
-            if(this.allowedOperations.indexOf(operation) === -1) {
+            if(this.allowedOperationsPost.indexOf(operation) === -1) {
                 new ResponseWriter("__NOT_ALLOWED_OPERATION__", response);
             } else {
                 let dataString = "";
