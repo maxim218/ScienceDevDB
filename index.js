@@ -141,7 +141,7 @@ class QuerySender {
 
     // метод для отправки запроса в СУБД и получения ответа от СУБД
     makeQuery(query, resultObj, callback) {
-        // создаём нового клиента для подключения к СУБ
+        // создаём нового клиента для подключения к СУБД
         const client = this.createNewClient();
         // подключаемся к СУБД
         client.connect();
