@@ -20,6 +20,49 @@ CREATE TABLE records
 
 /* -------------------------------------------------------- */
 
+CREATE OR REPLACE FUNCTION delete_one_record_of_user(login_param TEXT, password_param TEXT, record_id_param_string TEXT) RETURNS TEXT AS $$
+    DECLARE record_id_param BIGINT;
+    DECLARE man RECORD;
+    DECLARE zap RECORD;
+    DECLARE mixed RECORD;
+    DECLARE man_found BOOLEAN;
+    DECLARE zap_found BOOLEAN;
+    DECLARE it_is_his_zap BOOLEAN;
+BEGIN
+    man_found = False;
+    zap_found = False;
+    it_is_his_zap = False;
+
+    record_id_param = CAST(record_id_param_string AS BIGINT);
+
+    FOR man IN SELECT man_id FROM people WHERE man_nickname = login_param AND man_password = password_param LIMIT 1 LOOP
+        man_found = True;
+    END LOOP;
+    IF (man_found = False) THEN
+        RETURN '__MAN_NOT_FOUND__';
+    END IF;
+
+    FOR zap IN SELECT record_id FROM records WHERE record_id = record_id_param LIMIT 1 LOOP
+        zap_found = True;
+    END LOOP;
+    IF (zap_found = False) THEN
+        RETURN '__RECORD_NOT_EXISTS__';
+    END IF;
+
+    FOR mixed IN SELECT record_id, man_key, man_id, man_nickname FROM records INNER JOIN people ON (man_key = man_id) WHERE record_id = record_id_param AND man_nickname = login_param LIMIT 1 LOOP
+        it_is_his_zap = True;
+    END LOOP;
+    IF (it_is_his_zap = False) THEN
+        RETURN '__YOU_HAVE_NOT_RIGHTS_TO_DELETE_RECORD__';
+    END IF;
+
+    DELETE FROM records WHERE record_id = record_id_param;
+    RETURN '__DELETE_OK__';
+END;
+$$ LANGUAGE plpgsql;
+
+/* -------------------------------------------------------- */
+
 CREATE OR REPLACE FUNCTION get_records_of_user(login_param TEXT)
    RETURNS TABLE
    (

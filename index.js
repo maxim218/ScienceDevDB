@@ -737,6 +737,7 @@ class QueryGetter {
             "authorize_user",
             "add_record",
             "get_records",
+            "drop_record",
         ];
     }
 
@@ -841,6 +842,8 @@ class QueryGetter {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__ControllersScripts_UserAuthorizer__ = __webpack_require__(15);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__ControllersScripts_RecordAdder__ = __webpack_require__(16);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__ControllersScripts_RecordsGetter__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__ControllersScripts_RecordDeleter__ = __webpack_require__(18);
+
 
 
 
@@ -911,6 +914,14 @@ class UrlManager {
         if(operation === "get_records") {
             // создаём контроллер для получения записей на странице пользователя
             new __WEBPACK_IMPORTED_MODULE_6__ControllersScripts_RecordsGetter__["a" /* default */](this.pg, body, response);
+            // выходим из метода
+            return;
+        }
+
+        // операция на удаление записей со страницы пользователя
+        if(operation === "drop_record") {
+            // создаём контроллер для удаления записи пользователя
+            new __WEBPACK_IMPORTED_MODULE_7__ControllersScripts_RecordDeleter__["a" /* default */](this.pg, body, this.SHA256, response);
             // выходим из метода
             return;
         }
@@ -1417,6 +1428,139 @@ class RecordsGetter {
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = RecordsGetter;
+
+
+
+/***/ }),
+/* 18 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_ResponseWriter__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_FieldsFinder__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_QuerySender__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__HelpingScripts_StringGenerator__ = __webpack_require__(4);
+
+
+
+
+
+
+
+
+// класс-контроллер для удаления записи пользователя на его странице
+class RecordDeleter {
+    // конструктор
+    constructor(pg, body, SHA256, response) {
+        // инициализируем объект для взаимодействия с СУБД
+        this.pg = pg;
+        // инициализируем тело POST запроса
+        this.body = body;
+        // инициализируем объект для получения HASH от пароля
+        this.SHA256 = SHA256;
+        // инициализируем объект для отправки ответа клиенту
+        this.response = response;
+        // вызываем метод для удаления одной записи пользователя
+        this.deleteOneRecord();
+    }
+
+    // метод для удаления одной записи пользователя
+    deleteOneRecord() {
+        // задаём тело POST запроса
+        const body = this.body;
+
+        // проверяем наличие всех необходимых полей
+        // если НЕ все необходимые поля переданы
+        if(new __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_FieldsFinder__["a" /* default */](body, ["loginField", "passwordField", "recordID"]).controleFields() === false) {
+            // отправляем ответ клиенту, что не все поля переданы
+            new __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_ResponseWriter__["a" /* default */]("__NOT_ALL_FIELDS_WAS_FOUND__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // сохраняем логин
+        const login = (body.loginField + "").toString();
+        // сохраняем пароль
+        const password = (body.passwordField + "").toString();
+        // сохраняем ID удаляемой записи
+        const recordID = (body.recordID + "").toString();
+
+        // если логин или пароль пустые
+        if(login === "" || password === "") {
+            // отправляем ответ клиенту, что логин или пароль НЕ заполнены
+            new __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_ResponseWriter__["a" /* default */]("__EMPTY_LOGIN_OR_PASSWORD_FIELDS__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // если содержимое поля ID записи пусто
+        if(recordID === "") {
+            // отправляем ответ клиенту, что содержимое поля ID записи пусто
+            new __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_ResponseWriter__["a" /* default */]("__EMPTY_RECORD_ID__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // если логин имеет длину, которая больше 10-ти символов
+        if(login.length > 10) {
+            // отправляем ответ клиенту, что логин имеет слишком большую длину
+            new __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_ResponseWriter__["a" /* default */]("__LONG_LOGIN_FIELD__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // если логин или пароль содержат запретные символы
+        if(new __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__["a" /* default */](login).normalString() === false || new __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__["a" /* default */](password).normalString() === false) {
+            // отправляем ответ клиенту, что логин или пароль содержат запретные символы
+            new __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_ResponseWriter__["a" /* default */]("__BAD_CHARS_FIELD_LOGIN_OR_PASSWORD_FIELDS__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // переводим ID записи в целое число
+        let recordIdNumber = parseInt(recordID);
+        // если ID записи не является целым числом
+        if(recordIdNumber === undefined || recordIdNumber === null || isNaN(recordIdNumber) === true) {
+            // отправляем ответ клиенту, что ID записи не является числом
+            new __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_ResponseWriter__["a" /* default */]("__ID_NOT_NUMBER__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // если ID записи имеет слишком большое значение
+        if(recordIdNumber > 922337203685477) {
+            // отправляем ответ, что ID слишком большое
+            new __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_ResponseWriter__["a" /* default */]("__RECORD_ID_VERY_BIG__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // если ID записи отрицательное
+        if(recordIdNumber < 0) {
+            // отправляем ответ клиенту, что ID отрицательное
+            new __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_ResponseWriter__["a" /* default */]("__RECORD_ID_IS_OTRISATELN__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // объект для сохранения ответа от СУБД
+        let res = {
+            arr: []
+        };
+
+        // формируем строку для отправки запроса в СУБД
+        const query = new __WEBPACK_IMPORTED_MODULE_4__HelpingScripts_StringGenerator__["a" /* default */]("delete_one_record_of_user", [login, password, recordIdNumber]).generateQuery();
+        // отправляем запрос в СУБД
+        new __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_QuerySender__["a" /* default */](this.pg).makeQuery(query, res, () => {
+            // сохраняем ответ в строку
+            const answer = res.arr[0].answer.toString();
+            // отправляем ответ клиенту
+            new __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_ResponseWriter__["a" /* default */](answer, this.response);
+        });
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = RecordDeleter;
 
 
 
