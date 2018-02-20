@@ -27,7 +27,7 @@ CREATE OR REPLACE FUNCTION get_users_list() RETURNS TEXT AS $$
 BEGIN
     n = 0;
 
-    FOR man IN SELECT man_nickname FROM people ORDER BY man_nickname ASC LOOP
+    FOR man IN SELECT man_nickname FROM people ORDER BY LOWER(man_nickname) ASC LOOP
         n = n + 1;
         arr[n] = man.man_nickname;
     END LOOP;
