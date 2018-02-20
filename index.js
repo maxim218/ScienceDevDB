@@ -220,47 +220,6 @@ class ContentStringWatcher {
 "use strict";
 
 
-// класс для проверки наличия определённых полей у объекта
-class FieldsFinder {
-    // конструктор
-    constructor(obj, fieldsArray) {
-        // инициализируем объект, у которого проверяется наличие полей
-        this.obj = obj;
-        // инициализируем массив полей, которые должны быть у объекта
-        this.fieldsArray = fieldsArray;
-    }
-
-    // метод для проверки наличия полей у объекта
-    controleFields() {
-        // получаем объект
-        const obj = this.obj;
-        // получаем массив полей
-        const fieldsArray = this.fieldsArray;
-        // пробегаемся по всему массиву полей
-        for(let i = 0; i < fieldsArray.length; i++) {
-            // получаем название i-го поля
-            const fieldName = fieldsArray[i].toString();
-            // если поле НЕ существует
-            if(obj[fieldName] === null || obj[fieldName] === undefined) {
-                // говорим, что у объекта отсутствует необходимое поле
-                return false;
-            }
-        }
-        // если нас не выкинуло из цикла, объект имеет все необходимые поля
-        return true;
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = FieldsFinder;
-
-
-
-/***/ }),
-/* 4 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-
-
 // класс для формирования SQL текста запроса в СУБД
 class StringGenerator {
     // конструктор
@@ -310,6 +269,47 @@ class StringGenerator {
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = StringGenerator;
+
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+
+
+// класс для проверки наличия определённых полей у объекта
+class FieldsFinder {
+    // конструктор
+    constructor(obj, fieldsArray) {
+        // инициализируем объект, у которого проверяется наличие полей
+        this.obj = obj;
+        // инициализируем массив полей, которые должны быть у объекта
+        this.fieldsArray = fieldsArray;
+    }
+
+    // метод для проверки наличия полей у объекта
+    controleFields() {
+        // получаем объект
+        const obj = this.obj;
+        // получаем массив полей
+        const fieldsArray = this.fieldsArray;
+        // пробегаемся по всему массиву полей
+        for(let i = 0; i < fieldsArray.length; i++) {
+            // получаем название i-го поля
+            const fieldName = fieldsArray[i].toString();
+            // если поле НЕ существует
+            if(obj[fieldName] === null || obj[fieldName] === undefined) {
+                // говорим, что у объекта отсутствует необходимое поле
+                return false;
+            }
+        }
+        // если нас не выкинуло из цикла, объект имеет все необходимые поля
+        return true;
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = FieldsFinder;
 
 
 
@@ -730,6 +730,7 @@ class QueryGetter {
         this.allowedOperationsGet = [
             "about_server",
             "init_database",
+            "users_list",
         ];
         // массив разрешённых операций, вызывающихся с помощью POST запросов
         this.allowedOperationsPost = [
@@ -843,6 +844,8 @@ class QueryGetter {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__ControllersScripts_RecordAdder__ = __webpack_require__(16);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__ControllersScripts_RecordsGetter__ = __webpack_require__(17);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__ControllersScripts_RecordDeleter__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__ControllersScripts_UsersListGetter__ = __webpack_require__(19);
+
 
 
 
@@ -922,6 +925,14 @@ class UrlManager {
         if(operation === "drop_record") {
             // создаём контроллер для удаления записи пользователя
             new __WEBPACK_IMPORTED_MODULE_7__ControllersScripts_RecordDeleter__["a" /* default */](this.pg, body, this.SHA256, response);
+            // выходим из метода
+            return;
+        }
+
+        // операция на получение массива пользователей
+        if(operation === "users_list") {
+            // создаём контроллер для получения массива пользователей
+            new __WEBPACK_IMPORTED_MODULE_8__ControllersScripts_UsersListGetter__["a" /* default */](this.pg, response);
             // выходим из метода
             return;
         }
@@ -1010,9 +1021,9 @@ class DataBaseIniter {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_FieldsFinder__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_FieldsFinder__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ContentStringWatcher__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_StringGenerator__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_StringGenerator__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_QuerySender__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__HelpingScripts_ResponseWriter__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__HelpingScripts_PasswordHashModifier__ = __webpack_require__(6);
@@ -1112,9 +1123,9 @@ class UserRegistrator {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_ResponseWriter__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_FieldsFinder__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_FieldsFinder__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_StringGenerator__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_StringGenerator__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__HelpingScripts_QuerySender__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__HelpingScripts_PasswordHashModifier__ = __webpack_require__(6);
 
@@ -1215,9 +1226,9 @@ class UserAuthorizer {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_ResponseWriter__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_FieldsFinder__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_FieldsFinder__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_StringGenerator__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_StringGenerator__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__HelpingScripts_QuerySender__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__HelpingScripts_StringCodeManager__ = __webpack_require__(7);
 
@@ -1325,9 +1336,9 @@ class RecordAdder {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_ResponseWriter__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_FieldsFinder__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_FieldsFinder__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_StringGenerator__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_StringGenerator__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__HelpingScripts_QuerySender__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__HelpingScripts_StringCodeManager__ = __webpack_require__(7);
 
@@ -1437,10 +1448,10 @@ class RecordsGetter {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_ResponseWriter__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_FieldsFinder__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_FieldsFinder__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_QuerySender__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__HelpingScripts_StringGenerator__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__HelpingScripts_StringGenerator__ = __webpack_require__(3);
 
 
 
@@ -1561,6 +1572,54 @@ class RecordDeleter {
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = RecordDeleter;
+
+
+
+/***/ }),
+/* 19 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_StringGenerator__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_QuerySender__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ResponseWriter__ = __webpack_require__(0);
+
+
+
+
+
+
+// класс - контроллер для получения массива пользователей
+class UsersListGetter {
+    // конструктор
+    constructor(pg, response) {
+        // объект для работы с СУБД
+        this.pg = pg;
+        // объект для отправки ответа клиенту
+        this.response = response;
+        // вызываем метод для получения массива пользователей
+        this.getListOfUsers();
+    }
+
+    // метод для получения массива пользователей
+    getListOfUsers() {
+        // объект для сохранения ответа от СУБД
+        let res = {
+            arr: []
+        };
+
+        // формируем строку запроса в СУБД
+        const query = new __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_StringGenerator__["a" /* default */]("get_users_list", []).generateQuery();
+        // отправляем запрос в СУБД
+        new __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_QuerySender__["a" /* default */](this.pg).makeQuery(query, res, () => {
+            // сохраняем ответ в строку
+            const answer = res.arr[0].answer.toString();
+            // отправляем ответ клиенту
+            new __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ResponseWriter__["a" /* default */](answer, this.response);
+        });
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = UsersListGetter;
 
 
 

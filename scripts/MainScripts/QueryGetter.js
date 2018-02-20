@@ -19,6 +19,7 @@ export default class QueryGetter {
         this.allowedOperationsGet = [
             "about_server",
             "init_database",
+            "users_list",
         ];
         // массив разрешённых операций, вызывающихся с помощью POST запросов
         this.allowedOperationsPost = [

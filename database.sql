@@ -20,6 +20,28 @@ CREATE TABLE records
 
 /* -------------------------------------------------------- */
 
+CREATE OR REPLACE FUNCTION get_users_list() RETURNS TEXT AS $$
+    DECLARE n BIGINT;
+    DECLARE arr TEXT ARRAY;
+    DECLARE man RECORD;
+BEGIN
+    n = 0;
+
+    FOR man IN SELECT man_nickname FROM people ORDER BY man_nickname ASC LOOP
+        n = n + 1;
+        arr[n] = man.man_nickname;
+    END LOOP;
+
+    IF (n = 0) THEN
+        RETURN '[]';
+    END IF;
+
+    RETURN array_to_json(arr);
+END;
+$$ LANGUAGE plpgsql;
+
+/* -------------------------------------------------------- */
+
 CREATE OR REPLACE FUNCTION delete_one_record_of_user(login_param TEXT, password_param TEXT, record_id_param_string TEXT) RETURNS TEXT AS $$
     DECLARE record_id_param BIGINT;
     DECLARE man RECORD;

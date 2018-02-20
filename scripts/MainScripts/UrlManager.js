@@ -8,6 +8,7 @@ import UserAuthorizer from "../ControllersScripts/UserAuthorizer";
 import RecordAdder from "../ControllersScripts/RecordAdder";
 import RecordsGetter from "../ControllersScripts/RecordsGetter";
 import RecordDeleter from "../ControllersScripts/RecordDeleter";
+import UsersListGetter from "../ControllersScripts/UsersListGetter";
 
 // класс для реализации роутинга
 export default class UrlManager {
@@ -77,6 +78,14 @@ export default class UrlManager {
         if(operation === "drop_record") {
             // создаём контроллер для удаления записи пользователя
             new RecordDeleter(this.pg, body, this.SHA256, response);
+            // выходим из метода
+            return;
+        }
+
+        // операция на получение массива пользователей
+        if(operation === "users_list") {
+            // создаём контроллер для получения массива пользователей
+            new UsersListGetter(this.pg, response);
             // выходим из метода
             return;
         }
