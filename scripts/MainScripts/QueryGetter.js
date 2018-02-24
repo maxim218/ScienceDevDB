@@ -28,6 +28,7 @@ export default class QueryGetter {
             "add_record",
             "get_records",
             "drop_record",
+            "auth_hash_user",
         ];
     }
 

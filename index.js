@@ -739,6 +739,7 @@ class QueryGetter {
             "add_record",
             "get_records",
             "drop_record",
+            "auth_hash_user",
         ];
     }
 
@@ -845,6 +846,8 @@ class QueryGetter {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__ControllersScripts_RecordsGetter__ = __webpack_require__(17);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__ControllersScripts_RecordDeleter__ = __webpack_require__(18);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__ControllersScripts_UsersListGetter__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__ControllersScripts_AuthUserByHash__ = __webpack_require__(20);
+
 
 
 
@@ -933,6 +936,14 @@ class UrlManager {
         if(operation === "users_list") {
             // создаём контроллер для получения массива пользователей
             new __WEBPACK_IMPORTED_MODULE_8__ControllersScripts_UsersListGetter__["a" /* default */](this.pg, response);
+            // выходим из метода
+            return;
+        }
+
+        // операция на авторизацию пользователя по логину и hash от пароля
+        if(operation === "auth_hash_user") {
+            // создаём контроллер для авторизации пользователя по логину и hash от пароля
+            new __WEBPACK_IMPORTED_MODULE_9__ControllersScripts_AuthUserByHash__["a" /* default */](this.pg, body, this.SHA256, response);
             // выходим из метода
             return;
         }
@@ -1620,6 +1631,103 @@ class UsersListGetter {
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = UsersListGetter;
+
+
+
+/***/ }),
+/* 20 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_FieldsFinder__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ResponseWriter__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_StringGenerator__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__HelpingScripts_QuerySender__ = __webpack_require__(1);
+
+
+
+
+
+
+
+
+// класс - контроллер для авторизации пользователя по его логину и Hash от пароля
+class AuthUserByHash {
+    // конструктор
+    constructor(pg, body, SHA256, response) {
+        // инициализируем объект для взаимодействия с СУБД
+        this.pg = pg;
+        // инициализируем тело POST запроса
+        this.body = body;
+        // инициализируем объект для получения HASH от пароля
+        this.SHA256 = SHA256;
+        // инициализируем объект для отправки ответа клиенту
+        this.response = response;
+        // вызываем метод авторизации пользователя по его логину и Hash от пароля
+        this.authUserByHisPasswordHash();
+    }
+
+    // метод авторизации пользователя по логину и HASH от пароля
+    authUserByHisPasswordHash() {
+        // задаём тело POST запроса
+        const body = this.body;
+
+        // проверяем наличие всех необходимых полей
+        // если НЕ все необходимые поля переданы
+        if(new __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_FieldsFinder__["a" /* default */](body, ["loginField", "passwordField"]).controleFields() === false) {
+            // отправляем ответ клиенту, что не все поля переданы
+            new __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ResponseWriter__["a" /* default */]("__NOT_ALL_FIELDS_SENT__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // сохраняем логин
+        const login = (body.loginField + "").toString();
+        // сохраняем пароль
+        const password = (body.passwordField + "").toString();
+
+        // если логин или пароль пустые
+        if(login === "" || password === "") {
+            // отправляем ответ клиенту, что логин или пароль НЕ заполнены
+            new __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ResponseWriter__["a" /* default */]("__LOGIN_OR_PASSWORD_ARE_EMPTY__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // если логин имеет длину, которая больше 10-ти символов
+        if(login.length > 10) {
+            // отправляем ответ клиенту, что логин имеет слишком большую длину
+            new __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ResponseWriter__["a" /* default */]("__LONG_LOGIN__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // если логин или пароль содержат запретные символы
+        if(new __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__["a" /* default */](login).normalString() === false || new __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__["a" /* default */](password).normalString() === false) {
+            // отправляем ответ клиенту, что логин или пароль содержат запретные символы
+            new __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ResponseWriter__["a" /* default */]("__BAD_CHARS_LOGIN_OR_PASSWORD_FIELDS__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // объект для сохранения ответа от СУБД
+        let res = {
+            arr: []
+        };
+
+        // формируем строку для отправки запроса в СУБД
+        const query = new __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_StringGenerator__["a" /* default */]("normal_login_password", [login, password]).generateQuery();
+        // отправляем запрос в СУБД
+        new __WEBPACK_IMPORTED_MODULE_4__HelpingScripts_QuerySender__["a" /* default */](this.pg).makeQuery(query, res, () => {
+            // сохраняем ответ в строку
+            const answer = res.arr[0].answer.toString();
+            // отправляем ответ клиенту
+            new __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ResponseWriter__["a" /* default */](answer, this.response);
+        });
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = AuthUserByHash;
 
 
 

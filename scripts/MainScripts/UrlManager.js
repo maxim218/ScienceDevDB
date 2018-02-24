@@ -9,6 +9,7 @@ import RecordAdder from "../ControllersScripts/RecordAdder";
 import RecordsGetter from "../ControllersScripts/RecordsGetter";
 import RecordDeleter from "../ControllersScripts/RecordDeleter";
 import UsersListGetter from "../ControllersScripts/UsersListGetter";
+import AuthUserByHash from "../ControllersScripts/AuthUserByHash";
 
 // класс для реализации роутинга
 export default class UrlManager {
@@ -86,6 +87,14 @@ export default class UrlManager {
         if(operation === "users_list") {
             // создаём контроллер для получения массива пользователей
             new UsersListGetter(this.pg, response);
+            // выходим из метода
+            return;
+        }
+
+        // операция на авторизацию пользователя по логину и hash от пароля
+        if(operation === "auth_hash_user") {
+            // создаём контроллер для авторизации пользователя по логину и hash от пароля
+            new AuthUserByHash(this.pg, body, this.SHA256, response);
             // выходим из метода
             return;
         }
