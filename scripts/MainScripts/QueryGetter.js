@@ -29,6 +29,7 @@ export default class QueryGetter {
             "get_records",
             "drop_record",
             "auth_hash_user",
+            "create_movie",
         ];
     }
 

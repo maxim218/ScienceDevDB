@@ -320,86 +320,6 @@ class FieldsFinder {
 "use strict";
 
 
-// класс для импортирования библиотечных модулей
-class ModuleImporter {
-    // конструктор
-    constructor(s) {
-        // инициализируем имя модуля
-        this.initModuleName(s);
-    }
-
-    // метод для инициализации имени модуля
-    initModuleName(s) {
-        // сохраняем имя поля
-        this.moduleName = s.toString();
-    }
-
-    // метод для получения библиотечного модуля в виде объекта
-    getModule() {
-        // задаём строку, хранящую команду для импорта модуля
-        const command = " require('" + this.moduleName + "'); ";
-        // возвращаем объект
-        return eval(command);
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = ModuleImporter;
-
-
-
-/***/ }),
-/* 6 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ContentStringWatcher__ = __webpack_require__(2);
-
-
-
-
-// класс для замены запретных символов Hash строки пароля
-class PasswordHashModifier {
-    // конструктор
-    constructor(passwordHash) {
-        // инициализируем строку
-        this.passwordHash = (passwordHash + "").toString();
-    }
-
-    // метод для замены запретных символов Hash строки пароля
-    modifyIt() {
-        // получаем Hash строку пароля и переводим её в верхний регистр
-        const passwordHash = this.passwordHash.toUpperCase();
-        // переменная для хранения изменённой строки
-        let answer = "";
-        // пробегаемся по всем символам в строке
-        for(let i = 0; i < passwordHash.length; i++) {
-            // получаем i-ый символ строки
-            const c = passwordHash.charAt(i);
-            // если данный символ является разрешённым
-            if(__WEBPACK_IMPORTED_MODULE_0__ContentStringWatcher__["a" /* default */].normalChar(c) === true) {
-                // добавляем символ в конец результирующей строки
-                answer += c;
-            } else {
-                // если символ НЕ является разрешённым, то добавляем вместо него символ "A" в конец результирующей строки
-                answer += "A";
-            }
-        }
-        // добаляем к результирующей строке содержимое
-        answer = "ABAB" + answer + "ABAB";
-        // возвращаем строку, у которой все запретные символы заменены
-        return answer;
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = PasswordHashModifier;
-;
-
-
-/***/ }),
-/* 7 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-
-
 // класс для преобразования срок с целью ликвидации риска SQL инъекций
 class StringCodeManager {
     // конструктор
@@ -457,12 +377,92 @@ class StringCodeManager {
 
 
 /***/ }),
+/* 6 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+
+
+// класс для импортирования библиотечных модулей
+class ModuleImporter {
+    // конструктор
+    constructor(s) {
+        // инициализируем имя модуля
+        this.initModuleName(s);
+    }
+
+    // метод для инициализации имени модуля
+    initModuleName(s) {
+        // сохраняем имя поля
+        this.moduleName = s.toString();
+    }
+
+    // метод для получения библиотечного модуля в виде объекта
+    getModule() {
+        // задаём строку, хранящую команду для импорта модуля
+        const command = " require('" + this.moduleName + "'); ";
+        // возвращаем объект
+        return eval(command);
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = ModuleImporter;
+
+
+
+/***/ }),
+/* 7 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ContentStringWatcher__ = __webpack_require__(2);
+
+
+
+
+// класс для замены запретных символов Hash строки пароля
+class PasswordHashModifier {
+    // конструктор
+    constructor(passwordHash) {
+        // инициализируем строку
+        this.passwordHash = (passwordHash + "").toString();
+    }
+
+    // метод для замены запретных символов Hash строки пароля
+    modifyIt() {
+        // получаем Hash строку пароля и переводим её в верхний регистр
+        const passwordHash = this.passwordHash.toUpperCase();
+        // переменная для хранения изменённой строки
+        let answer = "";
+        // пробегаемся по всем символам в строке
+        for(let i = 0; i < passwordHash.length; i++) {
+            // получаем i-ый символ строки
+            const c = passwordHash.charAt(i);
+            // если данный символ является разрешённым
+            if(__WEBPACK_IMPORTED_MODULE_0__ContentStringWatcher__["a" /* default */].normalChar(c) === true) {
+                // добавляем символ в конец результирующей строки
+                answer += c;
+            } else {
+                // если символ НЕ является разрешённым, то добавляем вместо него символ "A" в конец результирующей строки
+                answer += "A";
+            }
+        }
+        // добаляем к результирующей строке содержимое
+        answer = "ABAB" + answer + "ABAB";
+        // возвращаем строку, у которой все запретные символы заменены
+        return answer;
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = PasswordHashModifier;
+;
+
+
+/***/ }),
 /* 8 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* WEBPACK VAR INJECTION */(function(process) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_ModuleImporter__ = __webpack_require__(5);
+/* WEBPACK VAR INJECTION */(function(process) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_ModuleImporter__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__QueryGetter__ = __webpack_require__(10);
 
 
@@ -740,6 +740,7 @@ class QueryGetter {
             "get_records",
             "drop_record",
             "auth_hash_user",
+            "create_movie",
         ];
     }
 
@@ -838,7 +839,7 @@ class QueryGetter {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ControllersScripts_AboutServerController__ = __webpack_require__(12);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ModuleImporter__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ModuleImporter__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__ControllersScripts_DataBaseIniter__ = __webpack_require__(13);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__ControllersScripts_UserRegistrator__ = __webpack_require__(14);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__ControllersScripts_UserAuthorizer__ = __webpack_require__(15);
@@ -847,6 +848,8 @@ class QueryGetter {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__ControllersScripts_RecordDeleter__ = __webpack_require__(18);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__ControllersScripts_UsersListGetter__ = __webpack_require__(19);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__ControllersScripts_AuthUserByHash__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__ControllersScripts_MovieCreator__ = __webpack_require__(21);
+
 
 
 
@@ -947,6 +950,14 @@ class UrlManager {
             // выходим из метода
             return;
         }
+
+        // операция создания ролика
+        if(operation === "create_movie") {
+            // создаём контроллер для создания ролика
+            new __WEBPACK_IMPORTED_MODULE_10__ControllersScripts_MovieCreator__["a" /* default */](this.pg, body, this.SHA256, response);
+            // выходим из метода
+            return;
+        }
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = UrlManager;
@@ -1037,7 +1048,7 @@ class DataBaseIniter {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_StringGenerator__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_QuerySender__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__HelpingScripts_ResponseWriter__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__HelpingScripts_PasswordHashModifier__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__HelpingScripts_PasswordHashModifier__ = __webpack_require__(7);
 
 
 
@@ -1138,7 +1149,7 @@ class UserRegistrator {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_StringGenerator__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__HelpingScripts_QuerySender__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__HelpingScripts_PasswordHashModifier__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__HelpingScripts_PasswordHashModifier__ = __webpack_require__(7);
 
 
 
@@ -1241,7 +1252,7 @@ class UserAuthorizer {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_StringGenerator__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__HelpingScripts_QuerySender__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__HelpingScripts_StringCodeManager__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__HelpingScripts_StringCodeManager__ = __webpack_require__(5);
 
 
 
@@ -1351,7 +1362,7 @@ class RecordAdder {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_StringGenerator__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__HelpingScripts_QuerySender__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__HelpingScripts_StringCodeManager__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__HelpingScripts_StringCodeManager__ = __webpack_require__(5);
 
 
 
@@ -1728,6 +1739,141 @@ class AuthUserByHash {
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = AuthUserByHash;
+
+
+
+/***/ }),
+/* 21 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_FieldsFinder__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ResponseWriter__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_StringGenerator__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__HelpingScripts_QuerySender__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__HelpingScripts_StringCodeManager__ = __webpack_require__(5);
+
+
+
+
+
+
+
+
+
+// класс - контроллер для создания нового ролика
+class MovieCreator {
+    // конструктор
+    constructor(pg, body, SHA256, response) {
+        // инициализируем объект для взаимодействия с СУБД
+        this.pg = pg;
+        // инициализируем тело POST запроса
+        this.body = body;
+        // инициализируем объект для получения HASH от пароля
+        this.SHA256 = SHA256;
+        // инициализируем объект для отправки ответа клиенту
+        this.response = response;
+        // вызываем метод создания нового ролика
+        this.createNewMovie();
+    }
+
+    // метод для создания нового ролика
+    createNewMovie() {
+        // задаём тело POST запроса
+        const body = this.body;
+
+        // проверяем наличие всех необходимых полей
+        // если НЕ все необходимые поля переданы
+        if(new __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_FieldsFinder__["a" /* default */](body, ["loginField", "passwordField", "movieName", "movieContent"]).controleFields() === false) {
+            // отправляем ответ клиенту, что не все поля переданы
+            new __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ResponseWriter__["a" /* default */]("__NOT_ALL_FIELDS__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // сохраняем логин
+        const login = (body.loginField + "").toString();
+        // сохраняем пароль
+        const password = (body.passwordField + "").toString();
+        // сохраняем имя ролика
+        const movieName = (body.movieName + "").toString();
+        // сохраняем содержимое ролика
+        const movieContent = (body.movieContent + "").toString();
+
+        // если логин или пароль пустые
+        if(login === "" || password === "") {
+            // отправляем ответ клиенту, что логин или пароль НЕ заполнены
+            new __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ResponseWriter__["a" /* default */]("__EMPTY_LOGIN_OR_PASSWORD__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // если имя ролика НЕ заполнено
+        if(movieName === "") {
+            // отправляем ответ, что имя ролика пусто
+            new __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ResponseWriter__["a" /* default */]("__EMPTY_MOVIE_NAME__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // если содержимое ролика пусто
+        if(movieContent === "") {
+            // отправляем ответ, что содержимое ролика пусто
+            new __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ResponseWriter__["a" /* default */]("__EMPTY_MOVIE_CONTENT__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // если логин имеет длину, которая больше 10-ти символов
+        if(login.length > 10) {
+            // отправляем ответ клиенту, что логин имеет слишком большую длину
+            new __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ResponseWriter__["a" /* default */]("__LONG_LOGIN__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // если имя ролика длиннее 10-ти символов
+        if(movieName.length > 10) {
+            // отправляем ответ, что имя ролика слишком длинное
+            new __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ResponseWriter__["a" /* default */]("__LONG_MOVIE_NAME__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // если логин или пароль содержат запретные символы
+        if(new __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__["a" /* default */](login).normalString() === false || new __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__["a" /* default */](password).normalString() === false) {
+            // отправляем ответ клиенту, что логин или пароль содержат запретные символы
+            new __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ResponseWriter__["a" /* default */]("__BAD_CHARS_FIELD_LOGIN_OR_PASSWORD__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // если имя ролика содержит запретные символы
+        if(new __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__["a" /* default */](movieName).normalString() === false) {
+            // отправляем ответ, что имя ролика имеет запретные символы
+            new __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ResponseWriter__["a" /* default */]("__BAD_CHARS_MOVIE_NAME__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // объект для сохранения ответа от СУБД
+        let res = {
+            arr: []
+        };
+
+        // формируем запрос к СУБД
+        const query = new __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_StringGenerator__["a" /* default */]("create_new_movie", [login, password, movieName, new __WEBPACK_IMPORTED_MODULE_5__HelpingScripts_StringCodeManager__["a" /* default */](movieContent).codeString()]).generateQuery();
+        // отправляем запрос в СУБД
+        new __WEBPACK_IMPORTED_MODULE_4__HelpingScripts_QuerySender__["a" /* default */](this.pg).makeQuery(query, res, () => {
+            // сохраняем ответ в строку
+            const answer = res.arr[0].answer.toString();
+            // отправляем ответ клиенту
+            new __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ResponseWriter__["a" /* default */](answer, this.response);
+        });
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = MovieCreator;
 
 
 

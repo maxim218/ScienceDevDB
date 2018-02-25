@@ -10,6 +10,7 @@ import RecordsGetter from "../ControllersScripts/RecordsGetter";
 import RecordDeleter from "../ControllersScripts/RecordDeleter";
 import UsersListGetter from "../ControllersScripts/UsersListGetter";
 import AuthUserByHash from "../ControllersScripts/AuthUserByHash";
+import MovieCreator from "../ControllersScripts/MovieCreator";
 
 // класс для реализации роутинга
 export default class UrlManager {
@@ -95,6 +96,14 @@ export default class UrlManager {
         if(operation === "auth_hash_user") {
             // создаём контроллер для авторизации пользователя по логину и hash от пароля
             new AuthUserByHash(this.pg, body, this.SHA256, response);
+            // выходим из метода
+            return;
+        }
+
+        // операция создания ролика
+        if(operation === "create_movie") {
+            // создаём контроллер для создания ролика
+            new MovieCreator(this.pg, body, this.SHA256, response);
             // выходим из метода
             return;
         }

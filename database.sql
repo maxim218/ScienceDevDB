@@ -20,6 +20,51 @@ CREATE TABLE records
 
 /* -------------------------------------------------------- */
 
+DROP TABLE IF EXISTS movies;
+
+CREATE TABLE movies
+(
+    movie_id BIGSERIAL PRIMARY KEY,
+    movie_name TEXT COLLATE "ucs_basic",
+    movie_user_id BIGINT,
+    movie_content TEXT COLLATE "ucs_basic"
+);
+
+/* -------------------------------------------------------- */
+
+CREATE OR REPLACE FUNCTION create_new_movie (login_param TEXT, password_param TEXT, movie_name_param TEXT, movie_content_param TEXT) RETURNS TEXT AS $$
+    DECLARE user_exists BOOLEAN;
+    DECLARE user_id BIGINT;
+    DECLARE man RECORD;
+    /* ----- */
+    DECLARE movie_exists BOOLEAN;
+    DECLARE movie RECORD;
+BEGIN
+    user_exists = False;
+    user_id = 0;
+    FOR man IN SELECT man_id, man_nickname, man_password FROM people WHERE man_nickname = login_param AND man_password = password_param LIMIT 1 LOOP
+        user_exists = True;
+        user_id = man.man_id;
+    END LOOP;
+    IF (user_exists = False) THEN
+        RETURN '__USER_NOT_CORRECT__';
+    END IF;
+    /* ----- */
+    movie_exists = False;
+    FOR movie IN SELECT movie_name, movie_user_id FROM movies WHERE movie_name = movie_name_param AND movie_user_id = user_id LIMIT 1 LOOP
+        movie_exists = True;
+    END LOOP;
+    IF (movie_exists = True) THEN
+        DELETE FROM movies WHERE movie_name = movie_name_param AND movie_user_id = user_id;
+    END IF;
+    /* ----- */
+    INSERT INTO movies (movie_name, movie_user_id, movie_content) VALUES (movie_name_param, user_id, movie_content_param);
+    RETURN '__CREATE_OK__';
+END;
+$$ LANGUAGE plpgsql;
+
+/* -------------------------------------------------------- */
+
 CREATE OR REPLACE FUNCTION get_users_list() RETURNS TEXT AS $$
     DECLARE n BIGINT;
     DECLARE arr TEXT ARRAY;
