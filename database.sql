@@ -32,7 +32,7 @@ CREATE TABLE movies
 
 /* -------------------------------------------------------- */
 
-CREATE OR REPLACE FUNCTION create_new_movie (login_param TEXT, password_param TEXT, movie_name_param TEXT, movie_content_param TEXT) RETURNS TEXT AS $$
+CREATE OR REPLACE FUNCTION create_or_update_movie (login_param TEXT, password_param TEXT, movie_name_param TEXT, movie_content_param TEXT) RETURNS TEXT AS $$
     DECLARE user_exists BOOLEAN;
     DECLARE user_id BIGINT;
     DECLARE man RECORD;
@@ -55,7 +55,8 @@ BEGIN
         movie_exists = True;
     END LOOP;
     IF (movie_exists = True) THEN
-        DELETE FROM movies WHERE movie_name = movie_name_param AND movie_user_id = user_id;
+        UPDATE movies SET movie_content = movie_content_param WHERE movie_name = movie_name_param AND movie_user_id = user_id;
+        RETURN '__UPDATE_OK__';
     END IF;
     /* ----- */
     INSERT INTO movies (movie_name, movie_user_id, movie_content) VALUES (movie_name_param, user_id, movie_content_param);

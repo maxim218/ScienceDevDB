@@ -1863,7 +1863,7 @@ class MovieCreator {
         };
 
         // формируем запрос к СУБД
-        const query = new __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_StringGenerator__["a" /* default */]("create_new_movie", [login, password, movieName, new __WEBPACK_IMPORTED_MODULE_5__HelpingScripts_StringCodeManager__["a" /* default */](movieContent).codeString()]).generateQuery();
+        const query = new __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_StringGenerator__["a" /* default */]("create_or_update_movie", [login, password, movieName, new __WEBPACK_IMPORTED_MODULE_5__HelpingScripts_StringCodeManager__["a" /* default */](movieContent).codeString()]).generateQuery();
         // отправляем запрос в СУБД
         new __WEBPACK_IMPORTED_MODULE_4__HelpingScripts_QuerySender__["a" /* default */](this.pg).makeQuery(query, res, () => {
             // сохраняем ответ в строку

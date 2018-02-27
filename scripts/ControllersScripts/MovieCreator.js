@@ -108,7 +108,7 @@ export default class MovieCreator {
         };
 
         // формируем запрос к СУБД
-        const query = new StringGenerator("create_new_movie", [login, password, movieName, new StringCodeManager(movieContent).codeString()]).generateQuery();
+        const query = new StringGenerator("create_or_update_movie", [login, password, movieName, new StringCodeManager(movieContent).codeString()]).generateQuery();
         // отправляем запрос в СУБД
         new QuerySender(this.pg).makeQuery(query, res, () => {
             // сохраняем ответ в строку
