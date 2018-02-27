@@ -30,6 +30,7 @@ export default class QueryGetter {
             "drop_record",
             "auth_hash_user",
             "create_movie",
+            "get_rolix_list",
         ];
     }
 

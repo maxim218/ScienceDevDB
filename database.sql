@@ -32,6 +32,27 @@ CREATE TABLE movies
 
 /* -------------------------------------------------------- */
 
+CREATE OR REPLACE FUNCTION get_rolix_list (login_param TEXT) RETURNS TEXT AS $$
+    DECLARE r RECORD;
+    DECLARE n BIGINT;
+    DECLARE arr TEXT ARRAY;
+BEGIN
+    n = 0;
+    FOR r IN SELECT movie_id, movie_name, movie_user_id, man_id, man_nickname FROM movies INNER JOIN people ON (man_id = movie_user_id) ORDER BY movie_id DESC LOOP
+        IF (r.man_nickname = login_param) THEN
+            n = n + 1;
+            arr[n] = r.movie_name;
+        END IF;
+    END LOOP;
+    IF (n = 0) THEN
+        RETURN '[]';
+    END IF;
+    RETURN array_to_json(arr);
+END;
+$$ LANGUAGE plpgsql;
+
+/* -------------------------------------------------------- */
+
 CREATE OR REPLACE FUNCTION create_or_update_movie (login_param TEXT, password_param TEXT, movie_name_param TEXT, movie_content_param TEXT) RETURNS TEXT AS $$
     DECLARE user_exists BOOLEAN;
     DECLARE user_id BIGINT;

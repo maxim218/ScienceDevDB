@@ -11,6 +11,7 @@ import RecordDeleter from "../ControllersScripts/RecordDeleter";
 import UsersListGetter from "../ControllersScripts/UsersListGetter";
 import AuthUserByHash from "../ControllersScripts/AuthUserByHash";
 import MovieCreator from "../ControllersScripts/MovieCreator";
+import RolixListController from "../ControllersScripts/RolixListController";
 
 // класс для реализации роутинга
 export default class UrlManager {
@@ -104,6 +105,14 @@ export default class UrlManager {
         if(operation === "create_movie") {
             // создаём контроллер для создания ролика
             new MovieCreator(this.pg, body, this.SHA256, response);
+            // выходим из метода
+            return;
+        }
+
+        // операция получения списка роликов пользователя
+        if(operation === "get_rolix_list") {
+            // создаём контроллер для получения списка роликов пользователя
+            new RolixListController(this.pg, body, this.SHA256, response);
             // выходим из метода
             return;
         }

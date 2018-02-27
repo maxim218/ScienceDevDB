@@ -741,6 +741,7 @@ class QueryGetter {
             "drop_record",
             "auth_hash_user",
             "create_movie",
+            "get_rolix_list",
         ];
     }
 
@@ -849,6 +850,8 @@ class QueryGetter {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__ControllersScripts_UsersListGetter__ = __webpack_require__(19);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__ControllersScripts_AuthUserByHash__ = __webpack_require__(20);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__ControllersScripts_MovieCreator__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__ControllersScripts_RolixListController__ = __webpack_require__(22);
+
 
 
 
@@ -955,6 +958,14 @@ class UrlManager {
         if(operation === "create_movie") {
             // создаём контроллер для создания ролика
             new __WEBPACK_IMPORTED_MODULE_10__ControllersScripts_MovieCreator__["a" /* default */](this.pg, body, this.SHA256, response);
+            // выходим из метода
+            return;
+        }
+
+        // операция получения списка роликов пользователя
+        if(operation === "get_rolix_list") {
+            // создаём контроллер для получения списка роликов пользователя
+            new __WEBPACK_IMPORTED_MODULE_11__ControllersScripts_RolixListController__["a" /* default */](this.pg, body, this.SHA256, response);
             // выходим из метода
             return;
         }
@@ -1874,6 +1885,101 @@ class MovieCreator {
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = MovieCreator;
+
+
+
+/***/ }),
+/* 22 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_FieldsFinder__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ContentStringWatcher__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_StringGenerator__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_QuerySender__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__HelpingScripts_ResponseWriter__ = __webpack_require__(0);
+
+
+
+
+
+
+
+
+// класс - контроллер для получения списка роликов определённого пользователя
+class RolixListController {
+    // конструктор
+    constructor(pg, body, SHA256, response) {
+        // инициализируем объект для взаимодействия с СУБД
+        this.pg = pg;
+        // инициализируем тело POST запроса
+        this.body = body;
+        // инициализируем объект для получения HASH от пароля
+        this.SHA256 = SHA256;
+        // инициализируем объект для отправки ответа клиенту
+        this.response = response;
+        // вызываем метод для получения списка роликов определённого пользователя
+        this.getRolixOfUser();
+    }
+
+    // метод для получения списка роликов определённого пользователя
+    getRolixOfUser() {
+        // тело запроса
+        const body = this.body;
+
+        // проверяем наличие необходимых полей в теле запроса
+        // если у объекта нет поля логина
+        if(new __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_FieldsFinder__["a" /* default */](body, ["loginField"]).controleFields() === false) {
+            // отсылаем ответ клиенту, что нет поля логина в теле запроса
+            new __WEBPACK_IMPORTED_MODULE_4__HelpingScripts_ResponseWriter__["a" /* default */]("__LOGIN_FIELD_NOT_FOUND__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // сохраняем переданный логин
+        const login = (body.loginField + "").toString();
+
+        // если логин пустой
+        if(login === "") {
+            // отправляем ответ клиенту, что логин пустой
+            new __WEBPACK_IMPORTED_MODULE_4__HelpingScripts_ResponseWriter__["a" /* default */]("__EMPTY_LOGIN__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // если логин длиннее 10-ти символов
+        if(login.length > 10) {
+            // отправляем ответ, что логин слишком длинный
+            new __WEBPACK_IMPORTED_MODULE_4__HelpingScripts_ResponseWriter__["a" /* default */]("__LONG_LOGIN__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // если логин содержит запретные символы
+        if(new __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ContentStringWatcher__["a" /* default */](login).normalString() === false) {
+            // отправляем ответ клиенту, что логин содержит запретные символы
+            new __WEBPACK_IMPORTED_MODULE_4__HelpingScripts_ResponseWriter__["a" /* default */]("__BAD_CHARS_LOGIN__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // объект для сохранения ответа от СУБД
+        let res = {
+            arr: []
+        };
+
+        // генерируем строку-запрос для отправки в СУБД
+        const query = new __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_StringGenerator__["a" /* default */]("get_rolix_list", [login]).generateQuery();
+        // отправляем запрос в СУБД
+        new __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_QuerySender__["a" /* default */](this.pg).makeQuery(query, res, () => {
+            // сохраняем ответ в строку
+            const answer = res.arr[0].answer.toString();
+            // отправляем ответ клиенту
+            new __WEBPACK_IMPORTED_MODULE_4__HelpingScripts_ResponseWriter__["a" /* default */](answer, this.response);
+        });
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = RolixListController;
 
 
 
