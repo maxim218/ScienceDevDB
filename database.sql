@@ -32,6 +32,20 @@ CREATE TABLE movies
 
 /* -------------------------------------------------------- */
 
+CREATE OR REPLACE FUNCTION get_one_rolic_by_login_and_name (login_param TEXT, movie_name_param TEXT) RETURNS TEXT AS $$
+    DECLARE r RECORD;
+    DECLARE ans TEXT;
+BEGIN
+    ans = '_NOT_FOUND_';
+    FOR r IN SELECT movie_id, movie_name, movie_user_id, movie_content, man_id, man_nickname FROM movies INNER JOIN people ON movie_user_id = man_id WHERE man_nickname = login_param AND movie_name = movie_name_param LIMIT 1 LOOP
+        ans = r.movie_content;
+    END LOOP;
+    RETURN ans;
+END;
+$$ LANGUAGE plpgsql;
+
+/* -------------------------------------------------------- */
+
 CREATE OR REPLACE FUNCTION get_rolix_list (login_param TEXT) RETURNS TEXT AS $$
     DECLARE r RECORD;
     DECLARE n BIGINT;

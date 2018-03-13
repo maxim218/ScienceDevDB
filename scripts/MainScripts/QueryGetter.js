@@ -31,6 +31,7 @@ export default class QueryGetter {
             "auth_hash_user",
             "create_movie",
             "get_rolix_list",
+            "get_rolic_by_login_and_name",
         ];
     }
 

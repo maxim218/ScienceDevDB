@@ -12,6 +12,7 @@ import UsersListGetter from "../ControllersScripts/UsersListGetter";
 import AuthUserByHash from "../ControllersScripts/AuthUserByHash";
 import MovieCreator from "../ControllersScripts/MovieCreator";
 import RolixListController from "../ControllersScripts/RolixListController";
+import OneRolicGetter from "../ControllersScripts/OneRolicGetter";
 
 // класс для реализации роутинга
 export default class UrlManager {
@@ -113,6 +114,14 @@ export default class UrlManager {
         if(operation === "get_rolix_list") {
             // создаём контроллер для получения списка роликов пользователя
             new RolixListController(this.pg, body, this.SHA256, response);
+            // выходим из метода
+            return;
+        }
+
+        // операция получения ролика по логину пользователя и имени ролика
+        if(operation === "get_rolic_by_login_and_name") {
+            // создаём контроллер для получения ролика по логину пользователя и имени ролика
+            new OneRolicGetter(this.pg, body, this.SHA256, response);
             // выходим из метода
             return;
         }

@@ -742,6 +742,7 @@ class QueryGetter {
             "auth_hash_user",
             "create_movie",
             "get_rolix_list",
+            "get_rolic_by_login_and_name",
         ];
     }
 
@@ -851,6 +852,8 @@ class QueryGetter {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__ControllersScripts_AuthUserByHash__ = __webpack_require__(20);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__ControllersScripts_MovieCreator__ = __webpack_require__(21);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__ControllersScripts_RolixListController__ = __webpack_require__(22);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__ControllersScripts_OneRolicGetter__ = __webpack_require__(23);
+
 
 
 
@@ -966,6 +969,14 @@ class UrlManager {
         if(operation === "get_rolix_list") {
             // создаём контроллер для получения списка роликов пользователя
             new __WEBPACK_IMPORTED_MODULE_11__ControllersScripts_RolixListController__["a" /* default */](this.pg, body, this.SHA256, response);
+            // выходим из метода
+            return;
+        }
+
+        // операция получения ролика по логину пользователя и имени ролика
+        if(operation === "get_rolic_by_login_and_name") {
+            // создаём контроллер для получения ролика по логину пользователя и имени ролика
+            new __WEBPACK_IMPORTED_MODULE_12__ControllersScripts_OneRolicGetter__["a" /* default */](this.pg, body, this.SHA256, response);
             // выходим из метода
             return;
         }
@@ -1980,6 +1991,118 @@ class RolixListController {
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = RolixListController;
+
+
+
+/***/ }),
+/* 23 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_ResponseWriter__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_FieldsFinder__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_StringGenerator__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__HelpingScripts_QuerySender__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__HelpingScripts_StringCodeManager__ = __webpack_require__(5);
+
+
+
+
+
+
+
+
+
+// класс - контроллер для получения ролика по логину пользователя и имени ролика
+class OneRolicGetter {
+    // конструктор
+    constructor(pg, body, SHA256, response) {
+        // инициализируем объект для взаимодействия с СУБД
+        this.pg = pg;
+        // инициализируем тело POST запроса
+        this.body = body;
+        // инициализируем объект для получения HASH от пароля
+        this.SHA256 = SHA256;
+        // инициализируем объект для отправки ответа клиенту
+        this.response = response;
+        // вызываем метод получения ролика по логину пользователя и имени ролика
+        this.getRolicByLoginAndName();
+    }
+
+    // метод для получения ролика по логину пользователя и имени ролика
+    getRolicByLoginAndName() {
+        // задаём тело POST запроса
+        const body = this.body;
+
+        // проверяем наличие всех необходимых полей
+        // если НЕ все необходимые поля переданы
+        if(new __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_FieldsFinder__["a" /* default */](body, ["loginField", "movieField"]).controleFields() === false) {
+            // отправляем ответ клиенту, что не все поля переданы
+            new __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_ResponseWriter__["a" /* default */]("__NOT_ALL_FIELDS__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // сохраняем логин
+        const login = (body.loginField + "").toString();
+        // сохраняем имя ролика
+        const movie = (body.movieField + "").toString();
+
+        // если логин или имя ролика пустые
+        if(login === "" || movie === "") {
+            // отправляем ответ, что логин или имя ролика пустые
+            new __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_ResponseWriter__["a" /* default */]("__EMPTY_LOGIN_OR_MOVIE__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // если логин или имя ролика имеют длину, которая больше 10-ти символов
+        if(login.length > 10 || movie.length > 10) {
+            // отправляем ответ клиенту, что логин или имя ролика слишком длинные
+            new __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_ResponseWriter__["a" /* default */]("__LONG_MOVIE_OR_LOGIN__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // если логин или имя ролика содержат запретные символы
+        if(new __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__["a" /* default */](login).normalString() === false || new __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__["a" /* default */](movie).normalString() === false) {
+            // отправляем ответ клиенту, что логин или имя ролика содержат запретные символы
+            new __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_ResponseWriter__["a" /* default */]("__BAD_CHARS_LOGIN_OR_MOVIE__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // объект для сохранения ответа от СУБД
+        let res = {
+            arr: []
+        };
+
+        // формируем строку для отправки запроса в СУБД
+        const query = new __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_StringGenerator__["a" /* default */]("get_one_rolic_by_login_and_name", [login, movie]).generateQuery();
+        // отправляем запрос в СУБД
+        new __WEBPACK_IMPORTED_MODULE_4__HelpingScripts_QuerySender__["a" /* default */](this.pg).makeQuery(query, res, () => {
+            // сохраняем ответ в строку
+            let answer = res.arr[0].answer.toString();
+            // если ролик не найден
+            if(answer === "_NOT_FOUND_") {
+                // отправляем ответ клиенту, что ролик НЕ найден
+                new __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_ResponseWriter__["a" /* default */](answer, this.response);
+                // выходим из метода
+                return;
+            } else {
+                // если ролик найден
+                // преобразуем строку
+                answer = new __WEBPACK_IMPORTED_MODULE_5__HelpingScripts_StringCodeManager__["a" /* default */](answer).decodeString() + "";
+                // отправляем ответ клиенту
+                new __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_ResponseWriter__["a" /* default */](answer, this.response);
+                // выходим из метода
+                return;
+            }
+        });
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = OneRolicGetter;
 
 
 
