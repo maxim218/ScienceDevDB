@@ -33,6 +33,7 @@ export default class QueryGetter {
             "get_rolix_list",
             "get_rolic_by_login_and_name",
             "save_update_proj",
+            "get_three_projects_of_user",
         ];
     }
 

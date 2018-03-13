@@ -44,6 +44,25 @@ CREATE TABLE threeprojects
 
 /* -------------------------------------------------------- */
 
+CREATE OR REPLACE FUNCTION get_three_projects (login_param TEXT) RETURNS TEXT AS $$
+    DECLARE k BIGINT;
+    DECLARE r RECORD;
+    DECLARE mass TEXT ARRAY;
+BEGIN
+    k = 0;
+    FOR r IN SELECT threeproject_id, threeproject_name FROM threeprojects WHERE threeproject_user_nickname = login_param ORDER BY threeproject_id DESC LOOP
+        k = k + 1;
+        mass[k] = r.threeproject_name;
+    END LOOP;
+    IF (k = 0) THEN
+        RETURN '[]';
+    END IF;
+    RETURN array_to_json(mass);
+END;
+$$ LANGUAGE plpgsql;
+
+/* -------------------------------------------------------- */
+
 CREATE OR REPLACE FUNCTION save_update_three_project (login_param TEXT, password_param TEXT, project_name TEXT, project_content TEXT) RETURNS TEXT AS $$
     DECLARE man_exist BOOLEAN;
     DECLARE man RECORD;

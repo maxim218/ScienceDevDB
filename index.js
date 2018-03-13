@@ -744,6 +744,7 @@ class QueryGetter {
             "get_rolix_list",
             "get_rolic_by_login_and_name",
             "save_update_proj",
+            "get_three_projects_of_user",
         ];
     }
 
@@ -855,6 +856,8 @@ class QueryGetter {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__ControllersScripts_RolixListController__ = __webpack_require__(22);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__ControllersScripts_OneRolicGetter__ = __webpack_require__(23);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__ControllersScripts_Project3Dsaver__ = __webpack_require__(24);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__ControllersScripts_GetterThreeProjectsNames__ = __webpack_require__(25);
+
 
 
 
@@ -988,6 +991,14 @@ class UrlManager {
         if(operation === "save_update_proj") {
             // создаём контроллер для сохранения и обновления 3D проекта
             new __WEBPACK_IMPORTED_MODULE_13__ControllersScripts_Project3Dsaver__["a" /* default */](this.pg, body, this.SHA256, response);
+            // выходим из метода
+            return;
+        }
+
+        // операция получения списка 3D проектов пользователя
+        if(operation === "get_three_projects_of_user") {
+            // создаём контроллер для получения списка 3D проектов пользователя
+            new __WEBPACK_IMPORTED_MODULE_14__ControllersScripts_GetterThreeProjectsNames__["a" /* default */](this.pg, body, this.SHA256, response);
             // выходим из метода
             return;
         }
@@ -2266,6 +2277,101 @@ class Project3Dsaver {
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Project3Dsaver;
+
+
+
+/***/ }),
+/* 25 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_ResponseWriter__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_FieldsFinder__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_StringGenerator__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__HelpingScripts_QuerySender__ = __webpack_require__(1);
+
+
+
+
+
+
+
+
+// класс - контроллер для получения списка 3D проектов пользователя
+class GetterThreeProjectsNames {
+    // конструктор
+    constructor(pg, body, SHA256, response) {
+        // инициализируем объект для взаимодействия с СУБД
+        this.pg = pg;
+        // инициализируем тело POST запроса
+        this.body = body;
+        // инициализируем объект для получения HASH от пароля
+        this.SHA256 = SHA256;
+        // инициализируем объект для отправки ответа клиенту
+        this.response = response;
+        // вызываем метод для получения списка 3D проектов пользователя
+        this.listOfThreeProjectsOfTheUser();
+    }
+
+    // метод для получения списка 3D проектов пользователя
+    listOfThreeProjectsOfTheUser() {
+        // задаём тело POST запроса
+        const body = this.body;
+
+        // проверяем наличие поля логина
+        // если поле НЕ перадано
+        if(new __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_FieldsFinder__["a" /* default */](body, ["loginField"]).controleFields() === false) {
+            // отправляем ответ клиенту, поле логина НЕ передано
+            new __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_ResponseWriter__["a" /* default */]("__NOT_LOGIN_FIELD__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // сохраняем логин
+        const login = (body.loginField + "").toString();
+
+        // если логин пустой
+        if(login === "") {
+            // отправляем ответ, что логин пустой
+            new __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_ResponseWriter__["a" /* default */]("__EMPTY_LOGIN__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // если логин длиннее 10-ти символов
+        if(login.length > 10) {
+            // отправляем ответ, что логин слишком длинный
+            new __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_ResponseWriter__["a" /* default */]("__VERY_LONG_LOGIN__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // если в логине есть запретные символы
+        if(new __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__["a" /* default */](login).normalString() === false) {
+            // отправляем ответ, что в логине запретные символы
+            new __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_ResponseWriter__["a" /* default */]("__BAD_CHARS_LOGIN__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // объект для сохранения ответа от СУБД
+        let res = {
+            arr: []
+        };
+
+        // формируем строку для отправки запроса в СУБД
+        const query = new __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_StringGenerator__["a" /* default */]("get_three_projects", [login]).generateQuery();
+        // отправляем запрос в СУБД
+        new __WEBPACK_IMPORTED_MODULE_4__HelpingScripts_QuerySender__["a" /* default */](this.pg).makeQuery(query, res, () => {
+            // сохраняем ответ в строку
+            const answer = res.arr[0].answer.toString();
+            // отправляем ответ клиенту
+            new __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_ResponseWriter__["a" /* default */](answer, this.response);
+        });
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = GetterThreeProjectsNames;
 
 
 
