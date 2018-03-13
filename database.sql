@@ -32,6 +32,48 @@ CREATE TABLE movies
 
 /* -------------------------------------------------------- */
 
+DROP TABLE IF EXISTS threeprojects;
+
+CREATE TABLE threeprojects
+(
+    threeproject_id BIGSERIAL PRIMARY KEY,
+    threeproject_name TEXT COLLATE "ucs_basic",
+    threeproject_user_nickname TEXT COLLATE "ucs_basic",
+    threeproject_content TEXT COLLATE "ucs_basic"
+);
+
+/* -------------------------------------------------------- */
+
+CREATE OR REPLACE FUNCTION save_update_three_project (login_param TEXT, password_param TEXT, project_name TEXT, project_content TEXT) RETURNS TEXT AS $$
+    DECLARE man_exist BOOLEAN;
+    DECLARE man RECORD;
+    /*******/
+    DECLARE project_exists BOOLEAN;
+    DECLARE project RECORD;
+BEGIN
+    man_exist = False;
+    FOR man IN SELECT man_nickname FROM people WHERE man_nickname = login_param AND man_password = password_param LIMIT 1 LOOP
+        man_exist = True;
+    END LOOP;
+    IF (man_exist = False) THEN
+        RETURN '__NO_USER__';
+    END IF;
+    /*******/
+    project_exists = False;
+    FOR project IN SELECT threeproject_name, threeproject_user_nickname FROM threeprojects WHERE threeproject_user_nickname = login_param AND threeproject_name = project_name LIMIT 1 LOOP
+        project_exists = True;
+    END LOOP;
+    IF (project_exists = True) THEN
+        UPDATE threeprojects SET threeproject_content = project_content WHERE threeproject_user_nickname = login_param AND threeproject_name = project_name;
+        RETURN '__UPDATE_PROJECT_OK__';
+    END IF;
+    INSERT INTO threeprojects (threeproject_name, threeproject_user_nickname, threeproject_content) VALUES (project_name, login_param, project_content);
+    RETURN '__INSERT_PROJECT_OK___';
+END;
+$$ LANGUAGE plpgsql;
+
+/* -------------------------------------------------------- */
+
 CREATE OR REPLACE FUNCTION get_one_rolic_by_login_and_name (login_param TEXT, movie_name_param TEXT) RETURNS TEXT AS $$
     DECLARE r RECORD;
     DECLARE ans TEXT;

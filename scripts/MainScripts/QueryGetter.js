@@ -32,6 +32,7 @@ export default class QueryGetter {
             "create_movie",
             "get_rolix_list",
             "get_rolic_by_login_and_name",
+            "save_update_proj",
         ];
     }
 

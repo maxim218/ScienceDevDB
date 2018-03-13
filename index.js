@@ -743,6 +743,7 @@ class QueryGetter {
             "create_movie",
             "get_rolix_list",
             "get_rolic_by_login_and_name",
+            "save_update_proj",
         ];
     }
 
@@ -853,6 +854,8 @@ class QueryGetter {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__ControllersScripts_MovieCreator__ = __webpack_require__(21);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__ControllersScripts_RolixListController__ = __webpack_require__(22);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__ControllersScripts_OneRolicGetter__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__ControllersScripts_Project3Dsaver__ = __webpack_require__(24);
+
 
 
 
@@ -977,6 +980,14 @@ class UrlManager {
         if(operation === "get_rolic_by_login_and_name") {
             // создаём контроллер для получения ролика по логину пользователя и имени ролика
             new __WEBPACK_IMPORTED_MODULE_12__ControllersScripts_OneRolicGetter__["a" /* default */](this.pg, body, this.SHA256, response);
+            // выходим из метода
+            return;
+        }
+
+        // операция сохранения и обновления 3D проекта
+        if(operation === "save_update_proj") {
+            // создаём контроллер для сохранения и обновления 3D проекта
+            new __WEBPACK_IMPORTED_MODULE_13__ControllersScripts_Project3Dsaver__["a" /* default */](this.pg, body, this.SHA256, response);
             // выходим из метода
             return;
         }
@@ -2103,6 +2114,158 @@ class OneRolicGetter {
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = OneRolicGetter;
+
+
+
+/***/ }),
+/* 24 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_FieldsFinder__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ResponseWriter__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_StringGenerator__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__HelpingScripts_QuerySender__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__HelpingScripts_StringCodeManager__ = __webpack_require__(5);
+
+
+
+
+
+
+
+
+
+// класс - контроллер для сохранения и обновления 3D проекта
+class Project3Dsaver {
+    // конструктор
+    constructor(pg, body, SHA256, response) {
+        // инициализируем объект для взаимодействия с СУБД
+        this.pg = pg;
+        // инициализируем тело POST запроса
+        this.body = body;
+        // инициализируем объект для получения HASH от пароля
+        this.SHA256 = SHA256;
+        // инициализируем объект для отправки ответа клиенту
+        this.response = response;
+        // вызываем метод сохранения и обновления 3D проекта
+        this.saveOrLoad3Dproject();
+    }
+
+    // метод сохранения и обновления 3D проекта
+    saveOrLoad3Dproject() {
+        // задаём тело POST запроса
+        const body = this.body;
+
+        // проверяем наличие всех необходимых полей
+        // если НЕ все необходимые поля переданы
+        if(new __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_FieldsFinder__["a" /* default */](body, ["loginField", "passwordField", "projectName", "projectContent"]).controleFields() === false) {
+            // отправляем ответ клиенту, что не все поля переданы
+            new __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ResponseWriter__["a" /* default */]("__NOT_ALL_FIELDS_GOT__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // сохраняем логин
+        const login = (body.loginField + "").toString();
+        // сохраняем пароль
+        const password = (body.passwordField + "").toString();
+        // сохраняем имя проекта
+        const projectName = (body.projectName + "").toString();
+        // сохраняем содержимое проекта
+        const projectContent = (body.projectContent + "").toString();
+
+        // если логин пуст
+        if(login === "") {
+            // отправляем ответ, что логин пуст
+            new __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ResponseWriter__["a" /* default */]("__EMPTY_LOGIN__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // если пароль пуст
+        if(password === "") {
+            // отправляем ответ, что пароль пуст
+            new __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ResponseWriter__["a" /* default */]("__EMPTY_PASSWORD__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // если имя проекта пусто
+        if(projectName === "") {
+            // отправляем ответ, что имя проекта пусто
+            new __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ResponseWriter__["a" /* default */]("__EMPTY_PROJECT_NAME__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // если содержимое проекта пусто
+        if(projectContent === "") {
+            // отправляем ответ, что содержимое проекта пусто
+            new __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ResponseWriter__["a" /* default */]("__EMPTY_PROJECT_CONTENT__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // если логин слишком длинный
+        if(login.length > 10) {
+            // отправляем ответ, что логин длинный
+            new __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ResponseWriter__["a" /* default */]("__LONG_LOGIN__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // если имя проекта слишком длинное
+        if(projectName.length > 10) {
+            // отправляем ответ, что имя проекта слишком длинное
+            new __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ResponseWriter__["a" /* default */]("__LONG_PROJECT_NAME__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // если логин содержит запретные символы
+        if(new __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__["a" /* default */](login).normalString() === false) {
+            // отправляем ответ, что в логине запретные символы
+            new __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ResponseWriter__["a" /* default */]("__BAD_CHARS_LOGIN__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // если в пароле есть запретные символы
+        if(new __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__["a" /* default */](password).normalString() === false) {
+            // отправляем ответ, что в пароле запретные символы
+            new __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ResponseWriter__["a" /* default */]("__BAD_CHARS_PASSWORD__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // если в имени проекта есть запретные символы
+        if(new __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__["a" /* default */](projectName).normalString() === false) {
+            // отправляем ответ, что в имени проекта есть запретные символы
+            new __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ResponseWriter__["a" /* default */]("__BAD_CHARS_PROJECT_NAME__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // объект для сохранения ответа от СУБД
+        let res = {
+            arr: []
+        };
+
+        // формируем запрос к СУБД
+        const query = new __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_StringGenerator__["a" /* default */]("save_update_three_project", [login, password, projectName, new __WEBPACK_IMPORTED_MODULE_5__HelpingScripts_StringCodeManager__["a" /* default */](projectContent).codeString()]).generateQuery();
+        // отправляем запрос в СУБД
+        new __WEBPACK_IMPORTED_MODULE_4__HelpingScripts_QuerySender__["a" /* default */](this.pg).makeQuery(query, res, () => {
+            // сохраняем ответ в строку
+            const answer = res.arr[0].answer.toString();
+            // отправляем ответ клиенту
+            new __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ResponseWriter__["a" /* default */](answer, this.response);
+        });
+
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Project3Dsaver;
 
 
 

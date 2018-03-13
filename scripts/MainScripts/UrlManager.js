@@ -13,6 +13,7 @@ import AuthUserByHash from "../ControllersScripts/AuthUserByHash";
 import MovieCreator from "../ControllersScripts/MovieCreator";
 import RolixListController from "../ControllersScripts/RolixListController";
 import OneRolicGetter from "../ControllersScripts/OneRolicGetter";
+import Project3Dsaver from "../ControllersScripts/Project3Dsaver";
 
 // класс для реализации роутинга
 export default class UrlManager {
@@ -122,6 +123,14 @@ export default class UrlManager {
         if(operation === "get_rolic_by_login_and_name") {
             // создаём контроллер для получения ролика по логину пользователя и имени ролика
             new OneRolicGetter(this.pg, body, this.SHA256, response);
+            // выходим из метода
+            return;
+        }
+
+        // операция сохранения и обновления 3D проекта
+        if(operation === "save_update_proj") {
+            // создаём контроллер для сохранения и обновления 3D проекта
+            new Project3Dsaver(this.pg, body, this.SHA256, response);
             // выходим из метода
             return;
         }
