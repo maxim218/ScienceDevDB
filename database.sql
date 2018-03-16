@@ -44,6 +44,20 @@ CREATE TABLE threeprojects
 
 /* -------------------------------------------------------- */
 
+CREATE OR REPLACE FUNCTION get_one_three_project_of_user (threeproject_name_param TEXT, threeproject_user_nickname_param TEXT) RETURNS TEXT AS $$
+    DECLARE s TEXT;
+    DECLARE r RECORD;
+BEGIN
+    s = '__PROJECT_3D_NOT_FOUND__';
+    FOR r IN SELECT * FROM threeprojects WHERE threeproject_name = threeproject_name_param AND threeproject_user_nickname = threeproject_user_nickname_param LIMIT 1 LOOP
+        s = r.threeproject_content;
+    END LOOP;
+    RETURN s;
+END;
+$$ LANGUAGE plpgsql;
+
+/* -------------------------------------------------------- */
+
 CREATE OR REPLACE FUNCTION get_three_projects (login_param TEXT) RETURNS TEXT AS $$
     DECLARE k BIGINT;
     DECLARE r RECORD;
