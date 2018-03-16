@@ -15,6 +15,7 @@ import RolixListController from "../ControllersScripts/RolixListController";
 import OneRolicGetter from "../ControllersScripts/OneRolicGetter";
 import Project3Dsaver from "../ControllersScripts/Project3Dsaver";
 import GetterThreeProjectsNames from "../ControllersScripts/GetterThreeProjectsNames";
+import ThreeProjGetter from "../ControllersScripts/ThreeProjGetter";
 
 // класс для реализации роутинга
 export default class UrlManager {
@@ -140,6 +141,14 @@ export default class UrlManager {
         if(operation === "get_three_projects_of_user") {
             // создаём контроллер для получения списка 3D проектов пользователя
             new GetterThreeProjectsNames(this.pg, body, this.SHA256, response);
+            // выходим из метода
+            return;
+        }
+
+        // операция получения содержимого 3D проекта пользователя
+        if(operation === "get_content_of_three_project_of_one_user") {
+            // создаём контроллер для получения 3D проекта пользователя
+            new ThreeProjGetter(this.pg, body, this.SHA256, response);
             // выходим из метода
             return;
         }
