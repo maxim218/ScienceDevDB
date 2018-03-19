@@ -44,6 +44,17 @@ CREATE TABLE threeprojects
 
 /* -------------------------------------------------------- */
 
+DROP TABLE IF EXISTS forums;
+
+CREATE TABLE forums
+(
+    forum_id BIGSERIAL PRIMARY KEY,
+    forum_user TEXT COLLATE "ucs_basic",
+    forum_content TEXT COLLATE "ucs_basic"
+);
+
+/* -------------------------------------------------------- */
+
 CREATE OR REPLACE FUNCTION get_one_three_project_of_user (threeproject_name_param TEXT, threeproject_user_nickname_param TEXT) RETURNS TEXT AS $$
     DECLARE s TEXT;
     DECLARE r RECORD;
