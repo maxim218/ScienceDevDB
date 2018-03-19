@@ -17,6 +17,7 @@ import Project3Dsaver from "../ControllersScripts/Project3Dsaver";
 import GetterThreeProjectsNames from "../ControllersScripts/GetterThreeProjectsNames";
 import ThreeProjGetter from "../ControllersScripts/ThreeProjGetter";
 import ForumAdder from "../ControllersScripts/ForumAdder";
+import ForumsListGetter from "../ControllersScripts/ForumsListGetter";
 
 // класс для реализации роутинга
 export default class UrlManager {
@@ -158,6 +159,14 @@ export default class UrlManager {
         if(operation === "add_forum") {
             // создаём контроллер для добавления нового форума
             new ForumAdder(this.pg, body, this.SHA256, response);
+            // выходим из метода
+            return;
+        }
+
+        // операция получения списка форумов
+        if(operation === "get_all_forums") {
+            // создаём контроллер для получения списка форумов
+            new ForumsListGetter(this.pg, response);
             // выходим из метода
             return;
         }

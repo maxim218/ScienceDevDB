@@ -172,54 +172,6 @@ class QuerySender {
 "use strict";
 
 
-// класс для проверки того, что строка состоит только из символов:  0-9, a-z, A-Z
-class ContentStringWatcher {
-    // конструктор
-    constructor(s) {
-        // инициализируем строку
-        this.s = s;
-    }
-
-    // метод для проверки того, что символ входит в множество символов:  0-9, a-z, A-Z
-    static normalChar(charParam) {
-        // переводим символ в нижний регистр
-        const c = charParam.toLowerCase();
-        // задаём множество разрешённых для использования символов в виде строки
-        // большие буквы не вошли в данную строку, так как проверяемый символ заранее переведён в нижний регистр
-        const allowedChars = "abcdefghijklmnopqrstuvwxyz0123456789";
-        // возвращает True, если символ входит в строку разрешённых символов
-        return allowedChars.indexOf(c) !== -1;
-    }
-
-    // метод для проверки того, что абсолютно все символы строки входят в множество символов:  0-9, a-z, A-Z
-    normalString() {
-        // получаем строку
-        const s = this.s;
-        // проходимся по всем символам строки
-        for(let i = 0; i < s.length; i++) {
-            // получаем i-ый символ строки
-            const c = s.charAt(i);
-            // если символ НЕ является разрешённым
-            if(ContentStringWatcher.normalChar(c) === false) {
-                // говорим, что строка некорректна
-                return false;
-            }
-        }
-        // если нас не выкинуло из цикла, строка является корректной
-        return true;
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = ContentStringWatcher;
-
-
-
-/***/ }),
-/* 3 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-
-
 // класс для формирования SQL текста запроса в СУБД
 class StringGenerator {
     // конструктор
@@ -269,6 +221,54 @@ class StringGenerator {
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = StringGenerator;
+
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+
+
+// класс для проверки того, что строка состоит только из символов:  0-9, a-z, A-Z
+class ContentStringWatcher {
+    // конструктор
+    constructor(s) {
+        // инициализируем строку
+        this.s = s;
+    }
+
+    // метод для проверки того, что символ входит в множество символов:  0-9, a-z, A-Z
+    static normalChar(charParam) {
+        // переводим символ в нижний регистр
+        const c = charParam.toLowerCase();
+        // задаём множество разрешённых для использования символов в виде строки
+        // большие буквы не вошли в данную строку, так как проверяемый символ заранее переведён в нижний регистр
+        const allowedChars = "abcdefghijklmnopqrstuvwxyz0123456789";
+        // возвращает True, если символ входит в строку разрешённых символов
+        return allowedChars.indexOf(c) !== -1;
+    }
+
+    // метод для проверки того, что абсолютно все символы строки входят в множество символов:  0-9, a-z, A-Z
+    normalString() {
+        // получаем строку
+        const s = this.s;
+        // проходимся по всем символам строки
+        for(let i = 0; i < s.length; i++) {
+            // получаем i-ый символ строки
+            const c = s.charAt(i);
+            // если символ НЕ является разрешённым
+            if(ContentStringWatcher.normalChar(c) === false) {
+                // говорим, что строка некорректна
+                return false;
+            }
+        }
+        // если нас не выкинуло из цикла, строка является корректной
+        return true;
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = ContentStringWatcher;
 
 
 
@@ -414,7 +414,7 @@ class ModuleImporter {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ContentStringWatcher__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ContentStringWatcher__ = __webpack_require__(3);
 
 
 
@@ -731,6 +731,7 @@ class QueryGetter {
             "about_server",
             "init_database",
             "users_list",
+            "get_all_forums",
         ];
         // массив разрешённых операций, вызывающихся с помощью POST запросов
         this.allowedOperationsPost = [
@@ -861,6 +862,8 @@ class QueryGetter {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__ControllersScripts_GetterThreeProjectsNames__ = __webpack_require__(25);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__ControllersScripts_ThreeProjGetter__ = __webpack_require__(26);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__ControllersScripts_ForumAdder__ = __webpack_require__(27);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__ControllersScripts_ForumsListGetter__ = __webpack_require__(28);
+
 
 
 
@@ -1024,6 +1027,14 @@ class UrlManager {
             // выходим из метода
             return;
         }
+
+        // операция получения списка форумов
+        if(operation === "get_all_forums") {
+            // создаём контроллер для получения списка форумов
+            new __WEBPACK_IMPORTED_MODULE_17__ControllersScripts_ForumsListGetter__["a" /* default */](this.pg, response);
+            // выходим из метода
+            return;
+        }
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = UrlManager;
@@ -1110,8 +1121,8 @@ class DataBaseIniter {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_FieldsFinder__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ContentStringWatcher__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_StringGenerator__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ContentStringWatcher__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_StringGenerator__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_QuerySender__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__HelpingScripts_ResponseWriter__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__HelpingScripts_PasswordHashModifier__ = __webpack_require__(7);
@@ -1212,8 +1223,8 @@ class UserRegistrator {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_ResponseWriter__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_FieldsFinder__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_StringGenerator__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_StringGenerator__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__HelpingScripts_QuerySender__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__HelpingScripts_PasswordHashModifier__ = __webpack_require__(7);
 
@@ -1315,8 +1326,8 @@ class UserAuthorizer {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_ResponseWriter__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_FieldsFinder__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_StringGenerator__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_StringGenerator__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__HelpingScripts_QuerySender__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__HelpingScripts_StringCodeManager__ = __webpack_require__(5);
 
@@ -1425,8 +1436,8 @@ class RecordAdder {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_ResponseWriter__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_FieldsFinder__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_StringGenerator__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_StringGenerator__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__HelpingScripts_QuerySender__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__HelpingScripts_StringCodeManager__ = __webpack_require__(5);
 
@@ -1537,9 +1548,9 @@ class RecordsGetter {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_ResponseWriter__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_FieldsFinder__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_QuerySender__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__HelpingScripts_StringGenerator__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__HelpingScripts_StringGenerator__ = __webpack_require__(2);
 
 
 
@@ -1668,7 +1679,7 @@ class RecordDeleter {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_StringGenerator__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_StringGenerator__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_QuerySender__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ResponseWriter__ = __webpack_require__(0);
 
@@ -1718,8 +1729,8 @@ class UsersListGetter {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_FieldsFinder__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ResponseWriter__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_StringGenerator__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_StringGenerator__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__HelpingScripts_QuerySender__ = __webpack_require__(1);
 
 
@@ -1815,8 +1826,8 @@ class AuthUserByHash {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_FieldsFinder__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ResponseWriter__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_StringGenerator__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_StringGenerator__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__HelpingScripts_QuerySender__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__HelpingScripts_StringCodeManager__ = __webpack_require__(5);
 
@@ -1949,8 +1960,8 @@ class MovieCreator {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_FieldsFinder__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ContentStringWatcher__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_StringGenerator__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ContentStringWatcher__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_StringGenerator__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_QuerySender__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__HelpingScripts_ResponseWriter__ = __webpack_require__(0);
 
@@ -2045,8 +2056,8 @@ class RolixListController {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_ResponseWriter__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_FieldsFinder__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_StringGenerator__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_StringGenerator__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__HelpingScripts_QuerySender__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__HelpingScripts_StringCodeManager__ = __webpack_require__(5);
 
@@ -2157,8 +2168,8 @@ class OneRolicGetter {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_FieldsFinder__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ResponseWriter__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_StringGenerator__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_StringGenerator__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__HelpingScripts_QuerySender__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__HelpingScripts_StringCodeManager__ = __webpack_require__(5);
 
@@ -2309,8 +2320,8 @@ class Project3Dsaver {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_ResponseWriter__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_FieldsFinder__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_StringGenerator__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_StringGenerator__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__HelpingScripts_QuerySender__ = __webpack_require__(1);
 
 
@@ -2404,8 +2415,8 @@ class GetterThreeProjectsNames {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_FieldsFinder__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ResponseWriter__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_StringGenerator__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_StringGenerator__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__HelpingScripts_QuerySender__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__HelpingScripts_StringCodeManager__ = __webpack_require__(5);
 
@@ -2540,8 +2551,8 @@ class ThreeProjGetter {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_ResponseWriter__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_FieldsFinder__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_StringGenerator__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_StringGenerator__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__HelpingScripts_QuerySender__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__HelpingScripts_StringCodeManager__ = __webpack_require__(5);
 
@@ -2655,6 +2666,69 @@ class ForumAdder {
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = ForumAdder;
+
+
+
+/***/ }),
+/* 28 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_StringGenerator__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_QuerySender__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ResponseWriter__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_StringCodeManager__ = __webpack_require__(5);
+
+
+
+
+
+
+
+// класс - контроллер для получения списка форумов
+class ForumsListGetter {
+    // конструктор
+    constructor(pg, response) {
+        // объект для работы с СУБД
+        this.pg = pg;
+        // объект для отправки ответа клиенту
+        this.response = response;
+        // вызываем метод для получения списка существующих форумов
+        this.getListOfExistingForums();
+    }
+
+    // метод для получения списка существующих форумов
+    getListOfExistingForums() {
+        // объект для сохранения ответа от СУБД
+        let res = {
+            arr: []
+        };
+
+        // формируем строку запроса в СУБД
+        const query = new __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_StringGenerator__["a" /* default */]("get_all_forums", []).generateQueryNoAnswer();
+        // отправляем запрос в СУБД
+        new __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_QuerySender__["a" /* default */](this.pg).makeQuery(query, res, () => {
+            // получаем ответ из базы данных в виде массива
+            const arr = res.arr;
+
+            // пробегаемся по всем ячейкам в массиве
+            for(let i = 0; i < arr.length; i++) {
+                // получаем i-ый элемент массива
+                const element = arr[i];
+                // преобразуем содержимое форума в человекочитаемый вид
+                const newValue =  new __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_StringCodeManager__["a" /* default */](element.forum_content).decodeString();
+                // заменяем содержимое форума на человекочитаемый вид
+                element.forum_content = newValue + "";
+            }
+
+            // преобразуем массив в JSON строку
+            const answer = JSON.stringify(arr);
+            // отправляем ответ клиенту
+            new __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ResponseWriter__["a" /* default */](answer, this.response);
+        });
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = ForumsListGetter;
 
 
 
