@@ -16,6 +16,7 @@ import OneRolicGetter from "../ControllersScripts/OneRolicGetter";
 import Project3Dsaver from "../ControllersScripts/Project3Dsaver";
 import GetterThreeProjectsNames from "../ControllersScripts/GetterThreeProjectsNames";
 import ThreeProjGetter from "../ControllersScripts/ThreeProjGetter";
+import ForumAdder from "../ControllersScripts/ForumAdder";
 
 // класс для реализации роутинга
 export default class UrlManager {
@@ -149,6 +150,14 @@ export default class UrlManager {
         if(operation === "get_content_of_three_project_of_one_user") {
             // создаём контроллер для получения 3D проекта пользователя
             new ThreeProjGetter(this.pg, body, this.SHA256, response);
+            // выходим из метода
+            return;
+        }
+
+        // операция добавления нового форума
+        if(operation === "add_forum") {
+            // создаём контроллер для добавления нового форума
+            new ForumAdder(this.pg, body, this.SHA256, response);
             // выходим из метода
             return;
         }
