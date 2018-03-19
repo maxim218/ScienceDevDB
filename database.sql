@@ -55,6 +55,24 @@ CREATE TABLE forums
 
 /* -------------------------------------------------------- */
 
+CREATE OR REPLACE FUNCTION add_forum (login_param TEXT, password_param TEXT, content_param TEXT) RETURNS TEXT AS $$
+    DECLARE user_exists BOOLEAN;
+    DECLARE man RECORD;
+BEGIN
+    user_exists = False;
+    FOR man IN SELECT man_nickname, man_password FROM people WHERE man_nickname = login_param AND man_password = password_param LIMIT 1 LOOP
+        user_exists = True;
+    END LOOP;
+    IF (user_exists = False) THEN
+        RETURN '__NO_USER__';
+    END IF;
+    INSERT INTO forums (forum_user, forum_content) VALUES (login_param, content_param);
+    RETURN '__INSERT_FORUM_OK__';
+END;
+$$ LANGUAGE plpgsql;
+
+/* -------------------------------------------------------- */
+
 CREATE OR REPLACE FUNCTION get_one_three_project_of_user (threeproject_name_param TEXT, threeproject_user_nickname_param TEXT) RETURNS TEXT AS $$
     DECLARE s TEXT;
     DECLARE r RECORD;
