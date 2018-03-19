@@ -36,6 +36,7 @@ export default class QueryGetter {
             "get_three_projects_of_user",
             "get_content_of_three_project_of_one_user",
             "add_forum",
+            "get_all_forums",
         ];
     }
 

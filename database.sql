@@ -55,6 +55,22 @@ CREATE TABLE forums
 
 /* -------------------------------------------------------- */
 
+CREATE OR REPLACE FUNCTION get_all_forums ()
+    RETURNS TABLE
+    (
+        forum_id BIGINT,
+        forum_user TEXT,
+        forum_content TEXT
+    )
+    AS $mytable$
+BEGIN
+    RETURN QUERY
+    SELECT * FROM forums ORDER BY forum_id DESC;
+END
+$mytable$ LANGUAGE plpgsql;
+
+/* -------------------------------------------------------- */
+
 CREATE OR REPLACE FUNCTION add_forum (login_param TEXT, password_param TEXT, content_param TEXT) RETURNS TEXT AS $$
     DECLARE user_exists BOOLEAN;
     DECLARE man RECORD;
