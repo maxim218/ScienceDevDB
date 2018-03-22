@@ -19,6 +19,7 @@ import ThreeProjGetter from "../ControllersScripts/ThreeProjGetter";
 import ForumAdder from "../ControllersScripts/ForumAdder";
 import ForumsListGetter from "../ControllersScripts/ForumsListGetter";
 import MessageAdder from "../ControllersScripts/MessageAdder";
+import MessagesGetter from "../ControllersScripts/MessagesGetter";
 
 // класс для реализации роутинга
 export default class UrlManager {
@@ -176,6 +177,14 @@ export default class UrlManager {
         if(operation === "add_message") {
             // создаём новый контроллер для добавления сообщения форума
             new MessageAdder(this.pg, body, this.SHA256, response);
+            // выходим из метода
+            return;
+        }
+
+        // операция получения сообщений определённого форума
+        if(operation === "get_forum_messages") {
+            // создаём контроллер для получения сообщений определённого форума
+            new MessagesGetter(this.pg, body, this.SHA256, response);
             // выходим из метода
             return;
         }

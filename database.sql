@@ -102,6 +102,24 @@ $$ LANGUAGE plpgsql;
 
 /* -------------------------------------------------------- */
 
+CREATE OR REPLACE FUNCTION get_forum_messages (forum_id_param_text TEXT)
+    RETURNS TABLE
+    (
+        hh_message_id BIGINT,
+        hh_message_user TEXT,
+        hh_message_forum_id BIGINT,
+        hh_message_content TEXT
+    )
+    AS $mytable$
+BEGIN
+    RETURN QUERY
+    SELECT message_id AS hh_message_id, message_user AS hh_message_user, message_forum_id AS hh_message_forum_id, message_content AS hh_message_content
+    FROM messages WHERE message_forum_id = CAST(forum_id_param_text AS BIGINT) ORDER BY message_id DESC;
+END
+$mytable$ LANGUAGE plpgsql;
+
+/* -------------------------------------------------------- */
+
 CREATE OR REPLACE FUNCTION get_all_forums ()
     RETURNS TABLE
     (

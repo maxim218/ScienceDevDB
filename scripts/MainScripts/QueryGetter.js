@@ -38,6 +38,7 @@ export default class QueryGetter {
             "get_content_of_three_project_of_one_user",
             "add_forum",
             "add_message",
+            "get_forum_messages",
         ];
     }
 
