@@ -67,6 +67,38 @@ CREATE TABLE messages
 
 /* -------------------------------------------------------- */
 
+CREATE OR REPLACE FUNCTION add_message (login_param TEXT, password_param TEXT, forum_id_param BIGINT, message_content_param TEXT) RETURNS TEXT AS $$
+    DECLARE user_exists BOOLEAN;
+    DECLARE man RECORD;
+    /***********************/
+    DECLARE forum_exists BOOLEAN;
+    DECLARE forum RECORD;
+    /***********************/
+BEGIN
+    user_exists = False;
+    forum_exists = False;
+    /***********************/
+    FOR man IN SELECT man_nickname, man_password FROM people WHERE man_nickname = login_param AND man_password = password_param LIMIT 1 LOOP
+        user_exists = True;
+    END LOOP;
+    IF (user_exists = False) THEN
+        RETURN '__USER_NOT_FOUND__';
+    END IF;
+    /***********************/
+    FOR forum IN SELECT forum_id FROM forums WHERE forum_id = forum_id_param LIMIT 1 LOOP
+        forum_exists = True;
+    END LOOP;
+    IF (forum_exists = False) THEN
+        RETURN '__FORUM_NOT_FOUND__';
+    END IF;
+    /***********************/
+    INSERT INTO mesages (message_user, message_forum_id, message_content) VALUES (login_param, forum_id_param, message_content_param);
+    RETURN '__INSERT_OK__';
+END;
+$$ LANGUAGE plpgsql;
+
+/* -------------------------------------------------------- */
+
 CREATE OR REPLACE FUNCTION get_all_forums ()
     RETURNS TABLE
     (
