@@ -55,6 +55,18 @@ CREATE TABLE forums
 
 /* -------------------------------------------------------- */
 
+DROP TABLE IF EXISTS messages;
+
+CREATE TABLE messages
+(
+    message_id BIGSERIAL PRIMARY KEY,
+    message_user TEXT COLLATE "ucs_basic",
+    message_forum_id BIGINT,
+    message_content TEXT COLLATE "ucs_basic"
+);
+
+/* -------------------------------------------------------- */
+
 CREATE OR REPLACE FUNCTION get_all_forums ()
     RETURNS TABLE
     (
