@@ -748,6 +748,7 @@ class QueryGetter {
             "get_three_projects_of_user",
             "get_content_of_three_project_of_one_user",
             "add_forum",
+            "add_message",
         ];
     }
 
@@ -863,6 +864,8 @@ class QueryGetter {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__ControllersScripts_ThreeProjGetter__ = __webpack_require__(26);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__ControllersScripts_ForumAdder__ = __webpack_require__(27);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__ControllersScripts_ForumsListGetter__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__ControllersScripts_MessageAdder__ = __webpack_require__(29);
+
 
 
 
@@ -1032,6 +1035,14 @@ class UrlManager {
         if(operation === "get_all_forums") {
             // создаём контроллер для получения списка форумов
             new __WEBPACK_IMPORTED_MODULE_17__ControllersScripts_ForumsListGetter__["a" /* default */](this.pg, response);
+            // выходим из метода
+            return;
+        }
+
+        // операция добавления сообщения форума
+        if(operation === "add_message") {
+            // создаём новый контроллер для добавления сообщения форума
+            new __WEBPACK_IMPORTED_MODULE_18__ControllersScripts_MessageAdder__["a" /* default */](this.pg, body, this.SHA256, response);
             // выходим из метода
             return;
         }
@@ -2729,6 +2740,168 @@ class ForumsListGetter {
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = ForumsListGetter;
+
+
+
+/***/ }),
+/* 29 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_FieldsFinder__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ResponseWriter__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_StringGenerator__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__HelpingScripts_QuerySender__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__HelpingScripts_StringCodeManager__ = __webpack_require__(5);
+
+
+
+
+
+
+
+
+
+// класс - контроллер для добавления сообщения форума
+class MessageAdder {
+    // конструктор
+    constructor(pg, body, SHA256, response) {
+        // инициализируем объект для взаимодействия с СУБД
+        this.pg = pg;
+        // инициализируем тело POST запроса
+        this.body = body;
+        // инициализируем объект для получения HASH от пароля
+        this.SHA256 = SHA256;
+        // инициализируем объект для отправки ответа клиенту
+        this.response = response;
+        // вызываем метод добавления сообщения форума
+        this.insertNewMessageToForum();
+    }
+
+    // метод добавления сообщения форума
+    insertNewMessageToForum() {
+        // задаём тело POST запроса
+        const body = this.body;
+
+        // проверяем наличие всех необходимых полей
+        // если НЕ все необходимые поля переданы
+        if(new __WEBPACK_IMPORTED_MODULE_0__HelpingScripts_FieldsFinder__["a" /* default */](body, ["loginField", "passwordField", "forumID", "messageContent"]).controleFields() === false) {
+            // отправляем ответ клиенту, что не все поля переданы
+            new __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ResponseWriter__["a" /* default */]("__NOT_ALL_FIELDS__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // сохраняем логин
+        const login = (body.loginField + "").toString();
+        // сохраняем пароль
+        const password = (body.passwordField + "").toString();
+        // сохраняем id форума
+        let forumID = (body.forumID + "").toString();
+        // сохраняем текст сообщения
+        const messageContent = (body.messageContent + "").toString();
+
+        // если логин пустой
+        if(login === "") {
+            // отправляем ответ, что логин пустой
+            new __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ResponseWriter__["a" /* default */]("__EMPTY_LOGIN__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // если пароль пустой
+        if(password === "") {
+            // отправляем ответ, что пароль пустой
+            new __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ResponseWriter__["a" /* default */]("__EMPTY_PASSWORD__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // если ID форума пусто
+        if(forumID === "") {
+            // отправляем ответ, что ID форума пусто
+            new __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ResponseWriter__["a" /* default */]("__EMPTY_FORUM_ID__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // если содержимое сообщения пусто
+        if(messageContent === "") {
+            // отправляем ответ, что содержимое сообщения пусто
+            new __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ResponseWriter__["a" /* default */]("__EMPTY_MESSAGE_CONTENT__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // если логин длиннее 10-ти символов
+        if(login.length > 10) {
+            // отправляем ответ клиенту, что логин слишком длинный
+            new __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ResponseWriter__["a" /* default */]("__VERY_LONG_LOGIN__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // если логин содержит запретные символы
+        if(new __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__["a" /* default */](login).normalString() === false) {
+            // отправляем ответ, что логин содержит запретные символы
+            new __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ResponseWriter__["a" /* default */]("__BAD_CHARS_LOGIN__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // если пароль содержит запретные символы
+        if(new __WEBPACK_IMPORTED_MODULE_2__HelpingScripts_ContentStringWatcher__["a" /* default */](password).normalString() === false) {
+            // отправляем ответ, что пароль содержит запретные символы
+            new __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ResponseWriter__["a" /* default */]("__BAD_CHARS_PASSWORD__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // переводим ID форума в целое число
+        forumID = parseInt(forumID);
+
+        // если ID форума НЕ является числом
+        if(forumID === undefined || forumID === null || isNaN(forumID) === true) {
+            // отправляем ответ клиенту, что ID не является числом
+            new __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ResponseWriter__["a" /* default */]("__FORUM_ID_NO_NUMBER__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // если ID форума слишком большое
+        if(forumID > 922337203685477) {
+            // отправляем ответ клиенту, что ID форума слишком большое
+            new __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ResponseWriter__["a" /* default */]("__FORUM_ID_VERY_HUGE__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // если ID меньше нуля
+        if(forumID < 0) {
+            // отправляем ответ клиенту, что ID меньше нуля
+            new __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ResponseWriter__["a" /* default */]("__FORUM_ID_IS_LESS_ZERO__", this.response);
+            // выходим из метода
+            return;
+        }
+
+        // объект для сохранения ответа от СУБД
+        let res = {
+            arr: []
+        };
+
+        // формируем запрос к СУБД
+        const query = new __WEBPACK_IMPORTED_MODULE_3__HelpingScripts_StringGenerator__["a" /* default */]("add_message", [login, password, forumID, new __WEBPACK_IMPORTED_MODULE_5__HelpingScripts_StringCodeManager__["a" /* default */](messageContent).codeString()]).generateQuery();
+        // отправляем запрос в СУБД
+        new __WEBPACK_IMPORTED_MODULE_4__HelpingScripts_QuerySender__["a" /* default */](this.pg).makeQuery(query, res, () => {
+            // сохраняем ответ в строку
+            const answer = res.arr[0].answer.toString();
+            // отправляем ответ клиенту
+            new __WEBPACK_IMPORTED_MODULE_1__HelpingScripts_ResponseWriter__["a" /* default */](answer, this.response);
+        });
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = MessageAdder;
 
 
 

@@ -67,14 +67,17 @@ CREATE TABLE messages
 
 /* -------------------------------------------------------- */
 
-CREATE OR REPLACE FUNCTION add_message (login_param TEXT, password_param TEXT, forum_id_param BIGINT, message_content_param TEXT) RETURNS TEXT AS $$
+CREATE OR REPLACE FUNCTION add_message (login_param TEXT, password_param TEXT, forum_id_param_text TEXT, message_content_param TEXT) RETURNS TEXT AS $$
     DECLARE user_exists BOOLEAN;
     DECLARE man RECORD;
     /***********************/
     DECLARE forum_exists BOOLEAN;
     DECLARE forum RECORD;
     /***********************/
+    DECLARE forum_id_param BIGINT;
 BEGIN
+    forum_id_param = CAST(forum_id_param_text AS BIGINT);
+    /***********************/
     user_exists = False;
     forum_exists = False;
     /***********************/
@@ -92,7 +95,7 @@ BEGIN
         RETURN '__FORUM_NOT_FOUND__';
     END IF;
     /***********************/
-    INSERT INTO mesages (message_user, message_forum_id, message_content) VALUES (login_param, forum_id_param, message_content_param);
+    INSERT INTO messages (message_user, message_forum_id, message_content) VALUES (login_param, forum_id_param, message_content_param);
     RETURN '__INSERT_OK__';
 END;
 $$ LANGUAGE plpgsql;
